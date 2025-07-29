@@ -58,7 +58,7 @@ export function DailySummary({ meals }: DailySummaryProps) {
   ];
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+    <div className="grid grid-cols-2 gap-4 md:grid-cols-2 lg:grid-cols-4">
       {stats.map((stat) => (
         <Card key={stat.title} className="shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">

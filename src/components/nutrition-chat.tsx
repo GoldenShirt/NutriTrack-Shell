@@ -35,7 +35,10 @@ export function NutritionChat() {
 
   useEffect(() => {
     if (scrollAreaRef.current) {
-        scrollAreaRef.current.scrollTo({ top: scrollAreaRef.current.scrollHeight, behavior: 'smooth' });
+        const scrollDiv = scrollAreaRef.current.querySelector("div");
+        if (scrollDiv) {
+            scrollDiv.scrollTo({ top: scrollDiv.scrollHeight, behavior: 'smooth' });
+        }
     }
   }, [messages]);
 
@@ -122,8 +125,8 @@ export function NutritionChat() {
 
   return (
     <div className="flex h-full flex-col">
-      <ScrollArea className="flex-1 p-4" ref={scrollAreaRef}>
-        <div className="space-y-6">
+      <ScrollArea className="flex-1" ref={scrollAreaRef}>
+        <div className="space-y-6 p-4">
           {messages.length === 0 && !isLoading && (
               <div className="text-center text-sm text-muted-foreground p-8 flex flex-col items-center gap-2">
                 <Sparkles className="h-6 w-6 text-primary" />

@@ -7,12 +7,12 @@ import { z } from "zod";
 import { Mic, Loader2, Wand2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import type { Meal } from "@/lib/types";
 import { analyzeMealAction } from "@/app/actions";
+import { CardDescription } from "@/components/ui/card";
 
 interface MealLoggerProps {
   onMealAdded: (meal: Meal) => void;
@@ -108,12 +108,8 @@ export function MealLogger({ onMealAdded }: MealLoggerProps) {
   };
 
   return (
-    <Card className="shadow-sm">
-      <CardHeader>
-        <CardTitle className="font-headline">Log a Meal</CardTitle>
-        <CardDescription>Describe what you ate, or use your voice.</CardDescription>
-      </CardHeader>
-      <CardContent>
+    <div className="p-2 space-y-4">
+      <CardDescription>Describe what you ate, or use your voice.</CardDescription>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
@@ -155,7 +151,6 @@ export function MealLogger({ onMealAdded }: MealLoggerProps) {
             </div>
           </form>
         </Form>
-      </CardContent>
-    </Card>
+    </div>
   );
 }
