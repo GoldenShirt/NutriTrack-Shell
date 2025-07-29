@@ -13,6 +13,7 @@ import { useUserStore } from "@/hooks/use-user-store";
 import { DialogFooter } from "./ui/dialog";
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
+import { FormControl } from "./ui/form";
 
 interface PreferencesFormProps {
   currentPreferences: UserPreferences;
