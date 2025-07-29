@@ -17,17 +17,6 @@ const initialPreferences: UserPreferences = {
   activityLevel: 'sedentary'
 };
 
-// This function is defined outside the hook to be callable from anywhere.
-const savePreferencesToLocalStorage = (preferences: UserPreferences) => {
-    try {
-      const userData = { preferences };
-      localStorage.setItem(STORE_KEY, JSON.stringify(userData));
-    } catch (error) {
-      console.error("Failed to save user data to localStorage", error);
-    }
-}
-
-
 export function useUserStore() {
   const [preferences, setPreferences] = useState<UserPreferences>(initialPreferences);
   const [isInitialized, setIsInitialized] = useState(false);
@@ -48,7 +37,12 @@ export function useUserStore() {
 
   useEffect(() => {
     if (isInitialized) {
-        savePreferencesToLocalStorage(preferences);
+        try {
+          const userData = { preferences };
+          localStorage.setItem(STORE_KEY, JSON.stringify(userData));
+        } catch (error) {
+          console.error("Failed to save user data to localStorage", error);
+        }
     }
   }, [preferences, isInitialized]);
 
@@ -56,9 +50,16 @@ export function useUserStore() {
     setPreferences(newPreferences);
   }, []);
 
+  // This ensures that saving preferences always creates a new object reference
   const savePreferences = useCallback((newPreferences: UserPreferences) => {
-    setPreferences(newPreferences);
-    savePreferencesToLocalStorage(newPreferences);
+    const updatedPrefs = {...newPreferences};
+    setPreferences(updatedPrefs);
+    try {
+        const userData = { preferences: updatedPrefs };
+        localStorage.setItem(STORE_KEY, JSON.stringify(userData));
+      } catch (error) {
+        console.error("Failed to save user data to localStorage", error);
+      }
   }, []);
 
   return { preferences, setPreferences: updatePreferences, savePreferences, isInitialized };

@@ -28,35 +28,34 @@ export function Dashboard() {
     (meal) => meal.date.split("T")[0] === today
   );
 
-  const getGoals = useCallback(async () => {
-    if (isUserInitialized) {
-      setIsLoadingGoals(true);
-      try {
-        if(preferences.age && preferences.weight && preferences.height && preferences.sex && preferences.activityLevel) {
-          const goals = await calculateGoalsAction({
-            age: preferences.age,
-            weight: preferences.weight,
-            height: preferences.height,
-            sex: preferences.sex,
-            activityLevel: preferences.activityLevel,
-            healthGoals: preferences.healthGoals
-          });
-          setDailyGoals(goals);
-        } else {
-          setDailyGoals(DEFAULT_GOALS);
-        }
-      } catch (error) {
-        console.error("Failed to calculate goals", error);
-        setDailyGoals(DEFAULT_GOALS);
-      } finally {
-        setIsLoadingGoals(false);
-      }
-    }
-  }, [isUserInitialized, preferences]);
-
   useEffect(() => {
+    const getGoals = async () => {
+      if (isUserInitialized) {
+        setIsLoadingGoals(true);
+        try {
+          if(preferences.age && preferences.weight && preferences.height && preferences.sex && preferences.activityLevel) {
+            const goals = await calculateGoalsAction({
+              age: preferences.age,
+              weight: preferences.weight,
+              height: preferences.height,
+              sex: preferences.sex,
+              activityLevel: preferences.activityLevel,
+              healthGoals: preferences.healthGoals
+            });
+            setDailyGoals(goals);
+          } else {
+            setDailyGoals(DEFAULT_GOALS);
+          }
+        } catch (error) {
+          console.error("Failed to calculate goals", error);
+          setDailyGoals(DEFAULT_GOALS);
+        } finally {
+          setIsLoadingGoals(false);
+        }
+      }
+    };
     getGoals();
-  }, [getGoals, preferences]);
+  }, [isUserInitialized, preferences]);
 
   if (!isMealsInitialized || isLoadingGoals) {
     return (
