@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useMealStore } from "@/hooks/use-meal-store";
 import { DailySummary } from "@/components/daily-summary";
 import { MealList } from "@/components/meal-list";
@@ -27,27 +27,35 @@ export function Dashboard() {
     (meal) => meal.date.split("T")[0] === today
   );
 
-  useEffect(() => {
-    async function getGoals() {
-      if (isUserInitialized) {
-        setIsLoadingGoals(true);
-        try {
-          if(preferences.age && preferences.weight && preferences.height && preferences.sex) {
-            const goals = await calculateGoalsAction(preferences);
-            setDailyGoals(goals);
-          } else {
-            setDailyGoals(DEFAULT_GOALS);
-          }
-        } catch (error) {
-          console.error("Failed to calculate goals", error);
+  const getGoals = useCallback(async () => {
+    if (isUserInitialized) {
+      setIsLoadingGoals(true);
+      try {
+        if(preferences.age && preferences.weight && preferences.height && preferences.sex && preferences.activityLevel) {
+          const goals = await calculateGoalsAction({
+            age: preferences.age,
+            weight: preferences.weight,
+            height: preferences.height,
+            sex: preferences.sex,
+            activityLevel: preferences.activityLevel,
+            healthGoals: preferences.healthGoals
+          });
+          setDailyGoals(goals);
+        } else {
           setDailyGoals(DEFAULT_GOALS);
-        } finally {
-          setIsLoadingGoals(false);
         }
+      } catch (error) {
+        console.error("Failed to calculate goals", error);
+        setDailyGoals(DEFAULT_GOALS);
+      } finally {
+        setIsLoadingGoals(false);
       }
     }
-    getGoals();
   }, [isUserInitialized, preferences]);
+
+  useEffect(() => {
+    getGoals();
+  }, [getGoals]);
 
   if (!isMealsInitialized || isLoadingGoals) {
     return (

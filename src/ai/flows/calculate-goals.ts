@@ -61,12 +61,12 @@ const prompt = ai.definePrompt({
       - active: 1.725
       - very_active: 1.9
   3.  Adjust the TDEE based on the user's health goals to get the final daily calorie goal:
-      - If 'Lose Weight' is a goal, subtract 500 calories.
-      - If 'Gain Muscle' is a goal (and not 'Lose Weight'), add 500 calories.
-      - If neither 'Lose Weight' nor 'Gain Muscle' are goals, use TDEE as the calorie goal.
+      - If healthGoals contains 'Lose Weight', subtract 500 calories.
+      - If healthGoals contains 'Gain Muscle' (and not 'Lose Weight'), add 500 calories.
+      - If neither 'Lose Weight' nor 'Gain Muscle' are in healthGoals, use TDEE as the calorie goal.
   4.  Determine the macronutrient split based on the health goals and the final calorie goal:
-      - If 'Lose Weight' is a goal: 35% carbs, 40% protein, 25% fats.
-      - If 'Gain Muscle' is a goal: 45% carbs, 35% protein, 20% fats.
+      - If healthGoals contains 'Lose Weight': 35% carbs, 40% protein, 25% fats.
+      - If healthGoals contains 'Gain Muscle': 45% carbs, 35% protein, 20% fats.
       - If neither (i.e., 'Maintain Weight' or other goals): 40% carbs, 30% protein, 30% fats.
   5.  Calculate the grams for each macronutrient:
       - Protein: 4 calories per gram.
