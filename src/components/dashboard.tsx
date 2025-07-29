@@ -1,16 +1,18 @@
 "use client";
 
+import { useState } from "react";
 import { useMealStore } from "@/hooks/use-meal-store";
 import { DailySummary } from "@/components/daily-summary";
 import { MealList } from "@/components/meal-list";
 import { Skeleton } from "@/components/ui/skeleton";
 import { NutritionChat } from "@/components/nutrition-chat";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Card } from "@/components/ui/card";
-import { Bot } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Bot, Sparkles } from "lucide-react";
 
 export function Dashboard() {
   const { meals, isInitialized } = useMealStore();
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
   const today = new Date().toISOString().split("T")[0];
   const todaysMeals = meals.filter(
@@ -33,23 +35,27 @@ export function Dashboard() {
 
   return (
     <div className="grid auto-rows-max items-start gap-4 md:gap-8 lg:col-span-2">
-        <Accordion type="single" collapsible className="w-full" defaultValue="item-1">
-            <AccordionItem value="item-1" className="border-b-0">
-                <Card className="shadow-sm">
-                    <AccordionTrigger className="p-6 font-headline text-xl hover:no-underline">
-                        <div className="flex items-center gap-2">
-                          <Bot className="h-6 w-6 text-primary" />
-                          <span>AI Nutrition Coach</span>
-                        </div>
-                    </AccordionTrigger>
-                    <AccordionContent className="px-2">
-                      <div className="h-[500px] border-t">
-                        <NutritionChat />
-                      </div>
-                    </AccordionContent>
-                </Card>
-            </AccordionItem>
-        </Accordion>
+      <Dialog open={isChatOpen} onOpenChange={setIsChatOpen}>
+        <DialogTrigger asChild>
+          <Button variant="outline" className="h-14 w-full justify-start rounded-lg bg-card px-4 text-left text-muted-foreground shadow-sm hover:bg-card">
+            <Sparkles className="mr-3 h-5 w-5 text-primary" />
+            Ask your AI nutrition coach...
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="sm:max-w-xl h-[70vh] flex flex-col p-0">
+          <DialogHeader className="p-6 pb-2">
+            <DialogTitle>
+                <div className="flex items-center gap-2 font-headline text-xl">
+                    <Bot className="h-6 w-6 text-primary" />
+                    <span>AI Nutrition Coach</span>
+                </div>
+            </DialogTitle>
+          </DialogHeader>
+          <div className="flex-1 overflow-hidden border-t">
+            <NutritionChat />
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <DailySummary meals={todaysMeals} />
       <div className="grid gap-4">
