@@ -1,4 +1,5 @@
 import type { AnalyzeMealOutput } from "@/ai/flows/analyze-meal";
+import { z } from "zod";
 
 export interface Meal extends AnalyzeMealOutput {
   id: string;
@@ -23,3 +24,11 @@ export interface UserPreferences {
   weight?: number;
   activityLevel?: "sedentary" | "light" | "moderate" | "active" | "very_active";
 }
+
+export const CalculateGoalsOutputSchema = z.object({
+  calories: z.number().describe('The recommended daily calorie intake.'),
+  protein: z.number().describe('The recommended daily protein intake in grams.'),
+  carbs: z.number().describe('The recommended daily carbohydrate intake in grams.'),
+  fats: z.number().describe('The recommended daily fat intake in grams.'),
+});
+export type DailyGoals = z.infer<typeof CalculateGoalsOutputSchema>;
