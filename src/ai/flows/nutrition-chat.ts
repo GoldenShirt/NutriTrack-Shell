@@ -36,9 +36,9 @@ const prompt = ai.definePrompt({
 
   User's Meal History:
   {{#if mealHistory}}
-  {{{mealHistory}}}
+    {{{mealHistory}}}
   {{else}}
-  No meal history available.
+    No meal history available.
   {{/if}}
 
   User Message: {{{message}}}
