@@ -74,7 +74,7 @@ export function NutritionChat() {
           const welcomeMessage: ChatMessage = {
             id: Date.now().toString(),
             role: "assistant",
-            message: "Welcome to your AI Nutrition Coach! To give you the best advice, I need to know a little more about you. Please set your dietary preferences and goals.",
+            message: "Welcome! To give you the best advice, I need to know a bit about you. For example, are you vegetarian, vegan, or have any allergies? What are your main health goals right now?\n\nYou can tell me here, or use the settings button to set your preferences.",
           };
           setMessages([welcomeMessage]);
           setIsLoading(false);
