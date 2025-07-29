@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useForm, Controller } from "react-hook-form";
@@ -13,7 +14,7 @@ import { useUserStore } from "@/hooks/use-user-store";
 import { DialogFooter } from "./ui/dialog";
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
-import { FormControl } from "./ui/form";
+import { Form, FormControl, FormField, FormItem } from "./ui/form";
 
 interface PreferencesFormProps {
   currentPreferences: UserPreferences;
@@ -37,12 +38,7 @@ const defaultGoalOptions = ["Lose Weight", "Gain Muscle", "Maintain Weight", "Im
 
 export function PreferencesForm({ currentPreferences, onSave }: PreferencesFormProps) {
   const { savePreferences } = useUserStore();
-  const {
-    control,
-    handleSubmit,
-    watch,
-    reset,
-  } = useForm<z.infer<typeof preferencesSchema>>({
+  const form = useForm<z.infer<typeof preferencesSchema>>({
     resolver: zodResolver(preferencesSchema),
     defaultValues: {
       dietaryRestrictions: currentPreferences.dietaryRestrictions || [],
@@ -58,7 +54,7 @@ export function PreferencesForm({ currentPreferences, onSave }: PreferencesFormP
   });
 
   useEffect(() => {
-    reset({
+    form.reset({
         dietaryRestrictions: currentPreferences.dietaryRestrictions || [],
         healthGoals: currentPreferences.healthGoals || [],
         likes: (currentPreferences.likes || []).join(', '),
@@ -69,7 +65,7 @@ export function PreferencesForm({ currentPreferences, onSave }: PreferencesFormP
         weight: currentPreferences.weight,
         activityLevel: currentPreferences.activityLevel || 'sedentary',
     });
-  }, [currentPreferences, reset]);
+  }, [currentPreferences, form.reset]);
 
   const onSubmit = (data: z.infer<typeof preferencesSchema>) => {
     const newPreferences: UserPreferences = {
@@ -83,183 +79,208 @@ export function PreferencesForm({ currentPreferences, onSave }: PreferencesFormP
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 p-1">
-      <div className="pr-4 max-h-[60vh] overflow-y-auto">
-        <div className="space-y-6">
-          
-          <div>
-            <Label className="font-semibold">Your Stats</Label>
-            <p className="text-sm text-muted-foreground mb-2">Provide your stats for personalized goal setting.</p>
-            <div className="grid grid-cols-2 gap-4">
-              <Controller
-                  name="age"
-                  control={control}
-                  render={({ field }) => (
-                    <div className="space-y-1">
-                      <Label htmlFor="age">Age</Label>
-                      <Input id="age" type="number" placeholder="e.g. 25" {...field} />
-                    </div>
-                  )}
-              />
-              <Controller
-                  name="sex"
-                  control={control}
-                  render={({ field }) => (
-                    <div className="space-y-1">
-                        <Label>Sex</Label>
-                        <RadioGroup
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                            className="flex gap-4 pt-2"
-                        >
-                            <div className="flex items-center space-x-2">
-                                <RadioGroupItem value="male" id="male" />
-                                <Label htmlFor="male" className="font-normal">Male</Label>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                                <RadioGroupItem value="female" id="female" />
-                                <Label htmlFor="female" className="font-normal">Female</Label>
-                            </div>
-                        </RadioGroup>
-                    </div>
-                  )}
-              />
-              <Controller
-                  name="height"
-                  control={control}
-                  render={({ field }) => (
-                    <div className="space-y-1">
-                      <Label htmlFor="height">Height (cm)</Label>
-                      <Input id="height" type="number" placeholder="e.g. 175" {...field} />
-                    </div>
-                  )}
-              />
-              <Controller
-                  name="weight"
-                  control={control}
-                  render={({ field }) => (
-                    <div className="space-y-1">
-                      <Label htmlFor="weight">Weight (kg)</Label>
-                      <Input id="weight" type="number" placeholder="e.g. 70" {...field} />
-                    </div>
-                  )}
-              />
-              <Controller
-                name="activityLevel"
-                control={control}
-                render={({ field }) => (
-                  <div className="space-y-1 col-span-2">
-                    <Label>Activity Level</Label>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select your activity level" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="sedentary">Sedentary (little to no exercise)</SelectItem>
-                        <SelectItem value="light">Lightly Active (light exercise/sports 1-3 days/week)</SelectItem>
-                        <SelectItem value="moderate">Moderately Active (moderate exercise/sports 3-5 days/week)</SelectItem>
-                        <SelectItem value="active">Very Active (hard exercise/sports 6-7 days a week)</SelectItem>
-                        <SelectItem value="very_active">Extra Active (very hard exercise/physical job)</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                )}
-              />
-            </div>
-          </div>
-
-          <div>
-            <Label className="font-semibold">Health Goals</Label>
-            <p className="text-sm text-muted-foreground mb-2">What are you trying to achieve?</p>
-            <div className="grid grid-cols-2 gap-2">
-              {defaultGoalOptions.map((option) => (
-                <Controller
-                  key={option}
-                  name="healthGoals"
-                  control={control}
-                  render={({ field }) => (
-                    <div className="flex items-center gap-2">
-                      <Checkbox
-                        id={`goal-${option}`}
-                        checked={field.value?.includes(option)}
-                        onCheckedChange={(checked) => {
-                          return checked
-                            ? field.onChange([...field.value, option])
-                            : field.onChange(
-                                field.value?.filter(
-                                  (value) => value !== option
-                                )
-                              );
-                        }}
-                      />
-                      <Label htmlFor={`goal-${option}`} className="font-normal">{option}</Label>
-                    </div>
-                  )}
+    <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 p-1">
+        <div className="pr-4 max-h-[60vh] overflow-y-auto">
+            <div className="space-y-6">
+            
+            <div>
+                <Label className="font-semibold">Your Stats</Label>
+                <p className="text-sm text-muted-foreground mb-2">Provide your stats for personalized goal setting.</p>
+                <div className="grid grid-cols-2 gap-4">
+                <FormField
+                    control={form.control}
+                    name="age"
+                    render={({ field }) => (
+                        <FormItem>
+                        <Label>Age</Label>
+                        <FormControl>
+                            <Input type="number" placeholder="e.g. 25" {...field} />
+                        </FormControl>
+                        </FormItem>
+                    )}
                 />
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <Label className="font-semibold">Dietary Restrictions</Label>
-            <p className="text-sm text-muted-foreground mb-2">Select any dietary needs you have.</p>
-            <div className="grid grid-cols-2 gap-2">
-              {defaultDietaryOptions.map((option) => (
-                <Controller
-                  key={option}
-                  name="dietaryRestrictions"
-                  control={control}
-                  render={({ field }) => (
-                    <div className="flex items-center gap-2">
-                      <Checkbox
-                        id={`diet-${option}`}
-                        checked={field.value?.includes(option)}
-                        onCheckedChange={(checked) => {
-                          return checked
-                            ? field.onChange([...field.value, option])
-                            : field.onChange(
-                                field.value?.filter(
-                                  (value) => value !== option
-                                )
-                              );
-                        }}
-                      />
-                      <Label htmlFor={`diet-${option}`} className="font-normal">{option}</Label>
-                    </div>
-                  )}
+                <FormField
+                    control={form.control}
+                    name="sex"
+                    render={({ field }) => (
+                        <FormItem className="space-y-2">
+                            <Label>Sex</Label>
+                            <FormControl>
+                            <RadioGroup
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
+                                className="flex gap-4 pt-1"
+                            >
+                                <FormItem className="flex items-center space-x-2">
+                                    <FormControl>
+                                        <RadioGroupItem value="male" id="male" />
+                                    </FormControl>
+                                    <Label htmlFor="male" className="font-normal">Male</Label>
+                                </FormItem>
+                                <FormItem className="flex items-center space-x-2">
+                                     <FormControl>
+                                        <RadioGroupItem value="female" id="female" />
+                                    </FormControl>
+                                    <Label htmlFor="female" className="font-normal">Female</Label>
+                                </FormItem>
+                            </RadioGroup>
+                            </FormControl>
+                        </FormItem>
+                    )}
                 />
-              ))}
+                <FormField
+                    control={form.control}
+                    name="height"
+                    render={({ field }) => (
+                        <FormItem>
+                        <Label>Height (cm)</Label>
+                        <FormControl>
+                            <Input type="number" placeholder="e.g. 175" {...field} />
+                        </FormControl>
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    control={form.control}
+                    name="weight"
+                    render={({ field }) => (
+                        <FormItem>
+                        <Label>Weight (kg)</Label>
+                        <FormControl>
+                            <Input type="number" placeholder="e.g. 70" {...field} />
+                        </FormControl>
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    control={form.control}
+                    name="activityLevel"
+                    render={({ field }) => (
+                    <FormItem className="col-span-2">
+                        <Label>Activity Level</Label>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                            <SelectTrigger>
+                            <SelectValue placeholder="Select your activity level" />
+                            </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                            <SelectItem value="sedentary">Sedentary (little to no exercise)</SelectItem>
+                            <SelectItem value="light">Lightly Active (light exercise/sports 1-3 days/week)</SelectItem>
+                            <SelectItem value="moderate">Moderately Active (moderate exercise/sports 3-5 days/week)</SelectItem>
+                            <SelectItem value="active">Very Active (hard exercise/sports 6-7 days a week)</SelectItem>
+                            <SelectItem value="very_active">Extra Active (very hard exercise/physical job)</SelectItem>
+                        </SelectContent>
+                        </Select>
+                    </FormItem>
+                    )}
+                />
+                </div>
             </div>
-          </div>
 
-          <div>
-            <Label htmlFor="likes" className="font-semibold">Likes</Label>
-            <p className="text-sm text-muted-foreground mb-2">List foods you enjoy, separated by commas.</p>
-            <Controller
+            <div>
+                <Label className="font-semibold">Health Goals</Label>
+                <p className="text-sm text-muted-foreground mb-2">What are you trying to achieve?</p>
+                <div className="grid grid-cols-2 gap-2">
+                {defaultGoalOptions.map((option) => (
+                    <FormField
+                    key={option}
+                    control={form.control}
+                    name="healthGoals"
+                    render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                            <FormControl>
+                                <Checkbox
+                                    checked={field.value?.includes(option)}
+                                    onCheckedChange={(checked) => {
+                                    return checked
+                                        ? field.onChange([...field.value, option])
+                                        : field.onChange(
+                                            field.value?.filter(
+                                            (value) => value !== option
+                                            )
+                                        );
+                                    }}
+                                />
+                            </FormControl>
+                            <Label className="font-normal">{option}</Label>
+                        </FormItem>
+                    )}
+                    />
+                ))}
+                </div>
+            </div>
+
+            <div>
+                <Label className="font-semibold">Dietary Restrictions</Label>
+                <p className="text-sm text-muted-foreground mb-2">Select any dietary needs you have.</p>
+                <div className="grid grid-cols-2 gap-2">
+                {defaultDietaryOptions.map((option) => (
+                    <FormField
+                    key={option}
+                    control={form.control}
+                    name="dietaryRestrictions"
+                    render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                            <FormControl>
+                                <Checkbox
+                                    checked={field.value?.includes(option)}
+                                    onCheckedChange={(checked) => {
+                                    return checked
+                                        ? field.onChange([...field.value, option])
+                                        : field.onChange(
+                                            field.value?.filter(
+                                            (value) => value !== option
+                                            )
+                                        );
+                                    }}
+                                />
+                            </FormControl>
+                            <Label className="font-normal">{option}</Label>
+                        </FormItem>
+                    )}
+                    />
+                ))}
+                </div>
+            </div>
+            
+            <FormField
+              control={form.control}
               name="likes"
-              control={control}
-              render={({ field }) => <Input id="likes" placeholder="e.g., chicken, broccoli, apples" {...field} />}
+              render={({ field }) => (
+                <FormItem>
+                  <Label className="font-semibold">Likes</Label>
+                  <p className="text-sm text-muted-foreground">List foods you enjoy, separated by commas.</p>
+                  <FormControl>
+                    <Input placeholder="e.g., chicken, broccoli, apples" {...field} />
+                  </FormControl>
+                </FormItem>
+              )}
             />
-          </div>
 
-          <div>
-            <Label htmlFor="dislikes" className="font-semibold">Dislikes</Label>
-            <p className="text-sm text-muted-foreground mb-2">List foods you want to avoid, separated by commas.</p>
-            <Controller
+            <FormField
+              control={form.control}
               name="dislikes"
-              control={control}
-              render={({ field }) => <Input id="dislikes" placeholder="e.g., cucumbers, olives" {...field} />}
+              render={({ field }) => (
+                <FormItem>
+                  <Label className="font-semibold">Dislikes</Label>
+                   <p className="text-sm text-muted-foreground">List foods you want to avoid, separated by commas.</p>
+                  <FormControl>
+                    <Input placeholder="e.g., cucumbers, olives" {...field} />
+                  </FormControl>
+                </FormItem>
+              )}
             />
-          </div>
+
+            </div>
         </div>
-      </div>
 
 
-      <DialogFooter className="pt-4">
-        <Button type="submit">Save Preferences</Button>
-      </DialogFooter>
-    </form>
+        <DialogFooter className="pt-4">
+            <Button type="submit">Save Preferences</Button>
+        </DialogFooter>
+        </form>
+    </Form>
   );
 }
