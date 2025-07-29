@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
@@ -55,7 +56,7 @@ export function Dashboard() {
 
   useEffect(() => {
     getGoals();
-  }, [getGoals]);
+  }, [getGoals, preferences]);
 
   if (!isMealsInitialized || isLoadingGoals) {
     return (
