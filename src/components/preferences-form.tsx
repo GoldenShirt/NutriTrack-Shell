@@ -10,6 +10,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { UserPreferences } from "@/lib/types";
 import { useEffect } from "react";
 import { useUserStore } from "@/hooks/use-user-store";
+import { DialogFooter } from "./ui/dialog";
 
 interface PreferencesFormProps {
   currentPreferences: UserPreferences;
@@ -64,93 +65,98 @@ export function PreferencesForm({ currentPreferences, onSave }: PreferencesFormP
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 p-1">
-      <div>
-        <Label className="font-semibold">Dietary Restrictions</Label>
-        <p className="text-sm text-muted-foreground mb-2">Select any dietary needs you have.</p>
-        <div className="grid grid-cols-2 gap-2">
-          {defaultDietaryOptions.map((option) => (
+      <div className="pr-4 max-h-[60vh] overflow-y-auto">
+        <div className="space-y-6">
+          <div>
+            <Label className="font-semibold">Dietary Restrictions</Label>
+            <p className="text-sm text-muted-foreground mb-2">Select any dietary needs you have.</p>
+            <div className="grid grid-cols-2 gap-2">
+              {defaultDietaryOptions.map((option) => (
+                <Controller
+                  key={option}
+                  name="dietaryRestrictions"
+                  control={control}
+                  render={({ field }) => (
+                    <div className="flex items-center gap-2">
+                      <Checkbox
+                        id={`diet-${option}`}
+                        checked={field.value?.includes(option)}
+                        onCheckedChange={(checked) => {
+                          return checked
+                            ? field.onChange([...field.value, option])
+                            : field.onChange(
+                                field.value?.filter(
+                                  (value) => value !== option
+                                )
+                              );
+                        }}
+                      />
+                      <Label htmlFor={`diet-${option}`} className="font-normal">{option}</Label>
+                    </div>
+                  )}
+                />
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <Label className="font-semibold">Health Goals</Label>
+            <p className="text-sm text-muted-foreground mb-2">What are you trying to achieve?</p>
+            <div className="grid grid-cols-2 gap-2">
+              {defaultGoalOptions.map((option) => (
+                <Controller
+                  key={option}
+                  name="healthGoals"
+                  control={control}
+                  render={({ field }) => (
+                    <div className="flex items-center gap-2">
+                      <Checkbox
+                        id={`goal-${option}`}
+                        checked={field.value?.includes(option)}
+                        onCheckedChange={(checked) => {
+                          return checked
+                            ? field.onChange([...field.value, option])
+                            : field.onChange(
+                                field.value?.filter(
+                                  (value) => value !== option
+                                )
+                              );
+                        }}
+                      />
+                      <Label htmlFor={`goal-${option}`} className="font-normal">{option}</Label>
+                    </div>
+                  )}
+                />
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <Label htmlFor="likes" className="font-semibold">Likes</Label>
+            <p className="text-sm text-muted-foreground mb-2">List foods you enjoy, separated by commas.</p>
             <Controller
-              key={option}
-              name="dietaryRestrictions"
+              name="likes"
               control={control}
-              render={({ field }) => (
-                <div className="flex items-center gap-2">
-                  <Checkbox
-                    id={`diet-${option}`}
-                    checked={field.value?.includes(option)}
-                    onCheckedChange={(checked) => {
-                      return checked
-                        ? field.onChange([...field.value, option])
-                        : field.onChange(
-                            field.value?.filter(
-                              (value) => value !== option
-                            )
-                          );
-                    }}
-                  />
-                  <Label htmlFor={`diet-${option}`} className="font-normal">{option}</Label>
-                </div>
-              )}
+              render={({ field }) => <Input id="likes" placeholder="e.g., chicken, broccoli, apples" {...field} />}
             />
-          ))}
+          </div>
+
+          <div>
+            <Label htmlFor="dislikes" className="font-semibold">Dislikes</Label>
+            <p className="text-sm text-muted-foreground mb-2">List foods you want to avoid, separated by commas.</p>
+            <Controller
+              name="dislikes"
+              control={control}
+              render={({ field }) => <Input id="dislikes" placeholder="e.g., cucumbers, olives" {...field} />}
+            />
+          </div>
         </div>
       </div>
 
-      <div>
-        <Label className="font-semibold">Health Goals</Label>
-        <p className="text-sm text-muted-foreground mb-2">What are you trying to achieve?</p>
-        <div className="grid grid-cols-2 gap-2">
-          {defaultGoalOptions.map((option) => (
-            <Controller
-              key={option}
-              name="healthGoals"
-              control={control}
-              render={({ field }) => (
-                <div className="flex items-center gap-2">
-                  <Checkbox
-                    id={`goal-${option}`}
-                    checked={field.value?.includes(option)}
-                    onCheckedChange={(checked) => {
-                      return checked
-                        ? field.onChange([...field.value, option])
-                        : field.onChange(
-                            field.value?.filter(
-                              (value) => value !== option
-                            )
-                          );
-                    }}
-                  />
-                  <Label htmlFor={`goal-${option}`} className="font-normal">{option}</Label>
-                </div>
-              )}
-            />
-          ))}
-        </div>
-      </div>
 
-      <div>
-        <Label htmlFor="likes" className="font-semibold">Likes</Label>
-        <p className="text-sm text-muted-foreground mb-2">List foods you enjoy, separated by commas.</p>
-        <Controller
-          name="likes"
-          control={control}
-          render={({ field }) => <Input id="likes" placeholder="e.g., chicken, broccoli, apples" {...field} />}
-        />
-      </div>
-
-      <div>
-        <Label htmlFor="dislikes" className="font-semibold">Dislikes</Label>
-        <p className="text-sm text-muted-foreground mb-2">List foods you want to avoid, separated by commas.</p>
-        <Controller
-          name="dislikes"
-          control={control}
-          render={({ field }) => <Input id="dislikes" placeholder="e.g., cucumbers, olives" {...field} />}
-        />
-      </div>
-
-      <div className="flex justify-end">
+      <DialogFooter className="pt-4">
         <Button type="submit">Save Preferences</Button>
-      </div>
+      </DialogFooter>
     </form>
   );
 }
