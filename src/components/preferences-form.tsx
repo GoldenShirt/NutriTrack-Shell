@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { UserPreferences } from "@/lib/types";
+import { useEffect } from "react";
 
 interface PreferencesFormProps {
   currentPreferences: UserPreferences;
@@ -29,7 +30,8 @@ export function PreferencesForm({ currentPreferences, onSave }: PreferencesFormP
     control,
     handleSubmit,
     watch,
-  } = useForm({
+    reset,
+  } = useForm<z.infer<typeof preferencesSchema>>({
     resolver: zodResolver(preferencesSchema),
     defaultValues: {
       dietaryRestrictions: currentPreferences.dietaryRestrictions || [],
@@ -39,12 +41,22 @@ export function PreferencesForm({ currentPreferences, onSave }: PreferencesFormP
     },
   });
 
-  const onSubmit = (data: any) => {
-    onSave(data);
+  useEffect(() => {
+    reset({
+        dietaryRestrictions: currentPreferences.dietaryRestrictions || [],
+        healthGoals: currentPreferences.healthGoals || [],
+        likes: (currentPreferences.likes || []).join(', '),
+        dislikes: (currentPreferences.dislikes || []).join(', '),
+    });
+  }, [currentPreferences, reset]);
+
+  const onSubmit = (data: z.infer<typeof preferencesSchema>) => {
+    onSave({
+        ...data,
+        likes: Array.isArray(data.likes) ? data.likes : data.likes.split(',').map(s => s.trim()).filter(Boolean),
+        dislikes: Array.isArray(data.dislikes) ? data.dislikes : data.dislikes.split(',').map(s => s.trim()).filter(Boolean),
+    });
   };
-  
-  const dietaryRestrictions = watch('dietaryRestrictions');
-  const healthGoals = watch('healthGoals');
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 p-1">

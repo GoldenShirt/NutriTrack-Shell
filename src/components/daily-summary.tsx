@@ -5,22 +5,25 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { DAILY_GOALS } from "@/lib/constants";
 import type { Meal } from "@/lib/types";
+import { useMemo } from "react";
 
 interface DailySummaryProps {
   meals: Meal[];
 }
 
 export function DailySummary({ meals }: DailySummaryProps) {
-  const summary = meals.reduce(
-    (acc, meal) => {
-      acc.calories += meal.calories;
-      acc.protein += meal.protein;
-      acc.carbs += meal.carbs;
-      acc.fats += meal.fats;
-      return acc;
-    },
-    { calories: 0, protein: 0, carbs: 0, fats: 0 }
-  );
+  const summary = useMemo(() => {
+    return meals.reduce(
+      (acc, meal) => {
+        acc.calories += meal.calories;
+        acc.protein += meal.protein;
+        acc.carbs += meal.carbs;
+        acc.fats += meal.fats;
+        return acc;
+      },
+      { calories: 0, protein: 0, carbs: 0, fats: 0 }
+    );
+  }, [meals]);
 
   const stats = [
     {
