@@ -55,19 +55,19 @@ const prompt = ai.definePrompt({
       - For females: BMR = 10 * weight (kg) + 6.25 * height (cm) - 5 * age (y) - 161
       - If sex is 'other', use the average of the male and female formulas.
   2.  Calculate Total Daily Energy Expenditure (TDEE) by multiplying BMR by the appropriate activity factor:
-      - Sedentary: 1.2
-      - Lightly active: 1.375
-      - Moderately active: 1.55
-      - Very active: 1.725
-      - Extra active: 1.9
+      - sedentary: 1.2
+      - light: 1.375
+      - moderate: 1.55
+      - active: 1.725
+      - very_active: 1.9
   3.  Adjust the TDEE based on the user's health goals to get the final daily calorie goal:
-      - 'Lose Weight': Subtract 500 calories.
-      - 'Gain Muscle': Add 500 calories.
-      - If both are present, prioritize 'Lose Weight'. If neither, use TDEE as the calorie goal.
-  4.  Determine the macronutrient split based on the final calorie goal and health goals:
-      - Default/Maintain Weight: 40% carbs, 30% protein, 30% fats.
-      - Lose Weight: 35% carbs, 40% protein, 25% fats.
-      - Gain Muscle: 45% carbs, 35% protein, 20% fats.
+      - If 'Lose Weight' is a goal, subtract 500 calories.
+      - If 'Gain Muscle' is a goal (and not 'Lose Weight'), add 500 calories.
+      - If neither 'Lose Weight' nor 'Gain Muscle' are goals, use TDEE as the calorie goal.
+  4.  Determine the macronutrient split based on the health goals and the final calorie goal:
+      - If 'Lose Weight' is a goal: 35% carbs, 40% protein, 25% fats.
+      - If 'Gain Muscle' is a goal: 45% carbs, 35% protein, 20% fats.
+      - If neither (i.e., 'Maintain Weight' or other goals): 40% carbs, 30% protein, 30% fats.
   5.  Calculate the grams for each macronutrient:
       - Protein: 4 calories per gram.
       - Carbs: 4 calories per gram.
