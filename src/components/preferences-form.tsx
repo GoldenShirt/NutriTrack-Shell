@@ -46,9 +46,9 @@ export function PreferencesForm({ currentPreferences, onSave }: PreferencesFormP
       likes: (currentPreferences.likes || []).join(', '),
       dislikes: (currentPreferences.dislikes || []).join(', '),
       sex: currentPreferences.sex,
-      age: currentPreferences.age,
-      height: currentPreferences.height,
-      weight: currentPreferences.weight,
+      age: currentPreferences.age || undefined,
+      height: currentPreferences.height || undefined,
+      weight: currentPreferences.weight || undefined,
       activityLevel: currentPreferences.activityLevel || 'sedentary',
     },
   });
@@ -60,9 +60,9 @@ export function PreferencesForm({ currentPreferences, onSave }: PreferencesFormP
         likes: (currentPreferences.likes || []).join(', '),
         dislikes: (currentPreferences.dislikes || []).join(', '),
         sex: currentPreferences.sex,
-        age: currentPreferences.age,
-        height: currentPreferences.height,
-        weight: currentPreferences.weight,
+        age: currentPreferences.age || undefined,
+        height: currentPreferences.height || undefined,
+        weight: currentPreferences.weight || undefined,
         activityLevel: currentPreferences.activityLevel || 'sedentary',
     });
   }, [currentPreferences, form.reset]);
@@ -95,7 +95,7 @@ export function PreferencesForm({ currentPreferences, onSave }: PreferencesFormP
                         <FormItem>
                         <Label>Age</Label>
                         <FormControl>
-                            <Input type="number" placeholder="e.g. 25" {...field} />
+                            <Input type="number" placeholder="e.g. 25" {...field} value={field.value ?? ''} />
                         </FormControl>
                         </FormItem>
                     )}
@@ -136,7 +136,7 @@ export function PreferencesForm({ currentPreferences, onSave }: PreferencesFormP
                         <FormItem>
                         <Label>Height (cm)</Label>
                         <FormControl>
-                            <Input type="number" placeholder="e.g. 175" {...field} />
+                            <Input type="number" placeholder="e.g. 175" {...field} value={field.value ?? ''} />
                         </FormControl>
                         </FormItem>
                     )}
@@ -148,7 +148,7 @@ export function PreferencesForm({ currentPreferences, onSave }: PreferencesFormP
                         <FormItem>
                         <Label>Weight (kg)</Label>
                         <FormControl>
-                            <Input type="number" placeholder="e.g. 70" {...field} />
+                            <Input type="number" placeholder="e.g. 70" {...field} value={field.value ?? ''} />
                         </FormControl>
                         </FormItem>
                     )}
@@ -195,9 +195,9 @@ export function PreferencesForm({ currentPreferences, onSave }: PreferencesFormP
                                     checked={field.value?.includes(option)}
                                     onCheckedChange={(checked) => {
                                     return checked
-                                        ? field.onChange([...field.value, option])
+                                        ? field.onChange([...(field.value || []), option])
                                         : field.onChange(
-                                            field.value?.filter(
+                                            (field.value || [])?.filter(
                                             (value) => value !== option
                                             )
                                         );
@@ -228,9 +228,9 @@ export function PreferencesForm({ currentPreferences, onSave }: PreferencesFormP
                                     checked={field.value?.includes(option)}
                                     onCheckedChange={(checked) => {
                                     return checked
-                                        ? field.onChange([...field.value, option])
+                                        ? field.onChange([...(field.value || []), option])
                                         : field.onChange(
-                                            field.value?.filter(
+                                            (field.value || [])?.filter(
                                             (value) => value !== option
                                             )
                                         );
@@ -284,3 +284,5 @@ export function PreferencesForm({ currentPreferences, onSave }: PreferencesFormP
     </Form>
   );
 }
+
+    
