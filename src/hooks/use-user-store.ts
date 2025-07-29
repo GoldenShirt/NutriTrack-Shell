@@ -10,6 +10,11 @@ const initialPreferences: UserPreferences = {
   healthGoals: [],
   likes: [],
   dislikes: [],
+  sex: undefined,
+  age: undefined,
+  height: undefined,
+  weight: undefined,
+  activityLevel: 'sedentary'
 };
 
 // This function is defined outside the hook to be callable from anywhere.

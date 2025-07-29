@@ -11,6 +11,8 @@ import { UserPreferences } from "@/lib/types";
 import { useEffect } from "react";
 import { useUserStore } from "@/hooks/use-user-store";
 import { DialogFooter } from "./ui/dialog";
+import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 
 interface PreferencesFormProps {
   currentPreferences: UserPreferences;
@@ -22,6 +24,11 @@ const preferencesSchema = z.object({
   healthGoals: z.array(z.string()),
   likes: z.string().transform(val => val.split(',').map(s => s.trim()).filter(Boolean)),
   dislikes: z.string().transform(val => val.split(',').map(s => s.trim()).filter(Boolean)),
+  sex: z.enum(["male", "female", "other"]).optional(),
+  age: z.coerce.number().optional(),
+  height: z.coerce.number().optional(),
+  weight: z.coerce.number().optional(),
+  activityLevel: z.enum(["sedentary", "light", "moderate", "active", "very_active"]).optional(),
 });
 
 const defaultDietaryOptions = ["Vegetarian", "Vegan", "Gluten-Free", "Dairy-Free", "Nut-Allergy"];
@@ -41,6 +48,11 @@ export function PreferencesForm({ currentPreferences, onSave }: PreferencesFormP
       healthGoals: currentPreferences.healthGoals || [],
       likes: (currentPreferences.likes || []).join(', '),
       dislikes: (currentPreferences.dislikes || []).join(', '),
+      sex: currentPreferences.sex,
+      age: currentPreferences.age,
+      height: currentPreferences.height,
+      weight: currentPreferences.weight,
+      activityLevel: currentPreferences.activityLevel || 'sedentary',
     },
   });
 
@@ -50,11 +62,17 @@ export function PreferencesForm({ currentPreferences, onSave }: PreferencesFormP
         healthGoals: currentPreferences.healthGoals || [],
         likes: (currentPreferences.likes || []).join(', '),
         dislikes: (currentPreferences.dislikes || []).join(', '),
+        sex: currentPreferences.sex,
+        age: currentPreferences.age,
+        height: currentPreferences.height,
+        weight: currentPreferences.weight,
+        activityLevel: currentPreferences.activityLevel || 'sedentary',
     });
   }, [currentPreferences, reset]);
 
   const onSubmit = (data: z.infer<typeof preferencesSchema>) => {
-    const newPreferences = {
+    const newPreferences: UserPreferences = {
+        ...currentPreferences,
         ...data,
         likes: Array.isArray(data.likes) ? data.likes : data.likes.split(',').map(s => s.trim()).filter(Boolean),
         dislikes: Array.isArray(data.dislikes) ? data.dislikes : data.dislikes.split(',').map(s => s.trim()).filter(Boolean),
@@ -67,35 +85,87 @@ export function PreferencesForm({ currentPreferences, onSave }: PreferencesFormP
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 p-1">
       <div className="pr-4 max-h-[60vh] overflow-y-auto">
         <div className="space-y-6">
+          
           <div>
-            <Label className="font-semibold">Dietary Restrictions</Label>
-            <p className="text-sm text-muted-foreground mb-2">Select any dietary needs you have.</p>
-            <div className="grid grid-cols-2 gap-2">
-              {defaultDietaryOptions.map((option) => (
-                <Controller
-                  key={option}
-                  name="dietaryRestrictions"
+            <Label className="font-semibold">Your Stats</Label>
+            <p className="text-sm text-muted-foreground mb-2">Provide your stats for personalized goal setting.</p>
+            <div className="grid grid-cols-2 gap-4">
+              <Controller
+                  name="age"
                   control={control}
                   render={({ field }) => (
-                    <div className="flex items-center gap-2">
-                      <Checkbox
-                        id={`diet-${option}`}
-                        checked={field.value?.includes(option)}
-                        onCheckedChange={(checked) => {
-                          return checked
-                            ? field.onChange([...field.value, option])
-                            : field.onChange(
-                                field.value?.filter(
-                                  (value) => value !== option
-                                )
-                              );
-                        }}
-                      />
-                      <Label htmlFor={`diet-${option}`} className="font-normal">{option}</Label>
+                    <div className="space-y-1">
+                      <Label htmlFor="age">Age</Label>
+                      <Input id="age" type="number" placeholder="e.g. 25" {...field} />
                     </div>
                   )}
-                />
-              ))}
+              />
+              <Controller
+                  name="sex"
+                  control={control}
+                  render={({ field }) => (
+                    <div className="space-y-1">
+                        <Label>Sex</Label>
+                        <RadioGroup
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            className="flex gap-4 pt-2"
+                        >
+                            <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="male" id="male" />
+                                <Label htmlFor="male" className="font-normal">Male</Label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="female" id="female" />
+                                <Label htmlFor="female" className="font-normal">Female</Label>
+                            </div>
+                        </RadioGroup>
+                    </div>
+                  )}
+              />
+              <Controller
+                  name="height"
+                  control={control}
+                  render={({ field }) => (
+                    <div className="space-y-1">
+                      <Label htmlFor="height">Height (cm)</Label>
+                      <Input id="height" type="number" placeholder="e.g. 175" {...field} />
+                    </div>
+                  )}
+              />
+              <Controller
+                  name="weight"
+                  control={control}
+                  render={({ field }) => (
+                    <div className="space-y-1">
+                      <Label htmlFor="weight">Weight (kg)</Label>
+                      <Input id="weight" type="number" placeholder="e.g. 70" {...field} />
+                    </div>
+                  )}
+              />
+              <Controller
+                name="activityLevel"
+                control={control}
+                render={({ field }) => (
+                  <div className="space-y-1 col-span-2">
+                    <Label>Activity Level</Label>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select your activity level" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="sedentary">Sedentary (little to no exercise)</SelectItem>
+                        <SelectItem value="light">Lightly Active (light exercise/sports 1-3 days/week)</SelectItem>
+                        <SelectItem value="moderate">Moderately Active (moderate exercise/sports 3-5 days/week)</SelectItem>
+                        <SelectItem value="active">Very Active (hard exercise/sports 6-7 days a week)</SelectItem>
+                        <SelectItem value="very_active">Extra Active (very hard exercise/physical job)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+              />
             </div>
           </div>
 
@@ -124,6 +194,38 @@ export function PreferencesForm({ currentPreferences, onSave }: PreferencesFormP
                         }}
                       />
                       <Label htmlFor={`goal-${option}`} className="font-normal">{option}</Label>
+                    </div>
+                  )}
+                />
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <Label className="font-semibold">Dietary Restrictions</Label>
+            <p className="text-sm text-muted-foreground mb-2">Select any dietary needs you have.</p>
+            <div className="grid grid-cols-2 gap-2">
+              {defaultDietaryOptions.map((option) => (
+                <Controller
+                  key={option}
+                  name="dietaryRestrictions"
+                  control={control}
+                  render={({ field }) => (
+                    <div className="flex items-center gap-2">
+                      <Checkbox
+                        id={`diet-${option}`}
+                        checked={field.value?.includes(option)}
+                        onCheckedChange={(checked) => {
+                          return checked
+                            ? field.onChange([...field.value, option])
+                            : field.onChange(
+                                field.value?.filter(
+                                  (value) => value !== option
+                                )
+                              );
+                        }}
+                      />
+                      <Label htmlFor={`diet-${option}`} className="font-normal">{option}</Label>
                     </div>
                   )}
                 />

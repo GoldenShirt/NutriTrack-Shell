@@ -3,15 +3,16 @@
 import { Apple, Beef, Cookie, CookingPot } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { DAILY_GOALS } from "@/lib/constants";
-import type { Meal } from "@/lib/types";
+import { DEFAULT_GOALS } from "@/lib/constants";
+import type { DailyGoals, Meal } from "@/lib/types";
 import { useMemo } from "react";
 
 interface DailySummaryProps {
   meals: Meal[];
+  goals: DailyGoals;
 }
 
-export function DailySummary({ meals }: DailySummaryProps) {
+export function DailySummary({ meals, goals }: DailySummaryProps) {
   const summary = useMemo(() => {
     return meals.reduce(
       (acc, meal) => {
@@ -29,7 +30,7 @@ export function DailySummary({ meals }: DailySummaryProps) {
     {
       title: "Calories",
       value: summary.calories,
-      goal: DAILY_GOALS.calories,
+      goal: goals.calories,
       unit: "kcal",
       icon: CookingPot,
       color: "text-red-500",
@@ -37,7 +38,7 @@ export function DailySummary({ meals }: DailySummaryProps) {
     {
       title: "Protein",
       value: summary.protein,
-      goal: DAILY_GOALS.protein,
+      goal: goals.protein,
       unit: "g",
       icon: Beef,
       color: "text-blue-500",
@@ -45,7 +46,7 @@ export function DailySummary({ meals }: DailySummaryProps) {
     {
       title: "Carbs",
       value: summary.carbs,
-      goal: DAILY_GOALS.carbs,
+      goal: goals.carbs,
       unit: "g",
       icon: Apple,
       color: "text-yellow-500",
@@ -53,7 +54,7 @@ export function DailySummary({ meals }: DailySummaryProps) {
     {
       title: "Fats",
       value: summary.fats,
-      goal: DAILY_GOALS.fats,
+      goal: goals.fats,
       unit: "g",
       icon: Cookie,
       color: "text-purple-500",

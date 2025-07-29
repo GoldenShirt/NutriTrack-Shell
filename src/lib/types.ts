@@ -17,4 +17,9 @@ export interface UserPreferences {
   healthGoals: string[];
   likes: string[];
   dislikes: string[];
+  sex?: "male" | "female" | "other";
+  age?: number;
+  height?: number;
+  weight?: number;
+  activityLevel?: "sedentary" | "light" | "moderate" | "active" | "very_active";
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMealStore } from "@/hooks/use-meal-store";
 import { DailySummary } from "@/components/daily-summary";
 import { MealList } from "@/components/meal-list";
@@ -9,17 +9,47 @@ import { NutritionChat } from "@/components/nutrition-chat";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Bot, Sparkles } from "lucide-react";
+import { useUserStore } from "@/hooks/use-user-store";
+import { calculateGoalsAction } from "@/app/actions";
+import { DEFAULT_GOALS } from "@/lib/constants";
+import type { DailyGoals } from "@/lib/types";
+
 
 export function Dashboard() {
-  const { meals, isInitialized } = useMealStore();
+  const { meals, isInitialized: isMealsInitialized } = useMealStore();
+  const { preferences, isInitialized: isUserInitialized } = useUserStore();
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [dailyGoals, setDailyGoals] = useState<DailyGoals>(DEFAULT_GOALS);
+  const [isLoadingGoals, setIsLoadingGoals] = useState(true);
 
   const today = new Date().toISOString().split("T")[0];
   const todaysMeals = meals.filter(
     (meal) => meal.date.split("T")[0] === today
   );
 
-  if (!isInitialized) {
+  useEffect(() => {
+    async function getGoals() {
+      if (isUserInitialized) {
+        setIsLoadingGoals(true);
+        try {
+          if(preferences.age && preferences.weight && preferences.height && preferences.sex) {
+            const goals = await calculateGoalsAction(preferences);
+            setDailyGoals(goals);
+          } else {
+            setDailyGoals(DEFAULT_GOALS);
+          }
+        } catch (error) {
+          console.error("Failed to calculate goals", error);
+          setDailyGoals(DEFAULT_GOALS);
+        } finally {
+          setIsLoadingGoals(false);
+        }
+      }
+    }
+    getGoals();
+  }, [isUserInitialized, preferences]);
+
+  if (!isMealsInitialized || isLoadingGoals) {
     return (
       <div className="space-y-4">
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -57,7 +87,7 @@ export function Dashboard() {
         </DialogContent>
       </Dialog>
 
-      <DailySummary meals={todaysMeals} />
+      <DailySummary meals={todaysMeals} goals={dailyGoals} />
       <div className="grid gap-4">
           <MealList meals={todaysMeals} />
       </div>
