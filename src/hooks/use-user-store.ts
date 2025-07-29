@@ -12,6 +12,17 @@ const initialPreferences: UserPreferences = {
   dislikes: [],
 };
 
+// This function is defined outside the hook to be callable from anywhere.
+const savePreferencesToLocalStorage = (preferences: UserPreferences) => {
+    try {
+      const userData = { preferences };
+      localStorage.setItem(STORE_KEY, JSON.stringify(userData));
+    } catch (error) {
+      console.error("Failed to save user data to localStorage", error);
+    }
+}
+
+
 export function useUserStore() {
   const [preferences, setPreferences] = useState<UserPreferences>(initialPreferences);
   const [isInitialized, setIsInitialized] = useState(false);
@@ -32,12 +43,7 @@ export function useUserStore() {
 
   useEffect(() => {
     if (isInitialized) {
-      try {
-        const userData = { preferences };
-        localStorage.setItem(STORE_KEY, JSON.stringify(userData));
-      } catch (error) {
-        console.error("Failed to save user data to localStorage", error);
-      }
+        savePreferencesToLocalStorage(preferences);
     }
   }, [preferences, isInitialized]);
 
@@ -45,5 +51,10 @@ export function useUserStore() {
     setPreferences(newPreferences);
   }, []);
 
-  return { preferences, setPreferences: updatePreferences, isInitialized };
+  const savePreferences = useCallback((newPreferences: UserPreferences) => {
+    setPreferences(newPreferences);
+    savePreferencesToLocalStorage(newPreferences);
+  }, []);
+
+  return { preferences, setPreferences: updatePreferences, savePreferences, isInitialized };
 }

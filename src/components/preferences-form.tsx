@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { UserPreferences } from "@/lib/types";
 import { useEffect } from "react";
+import { useUserStore } from "@/hooks/use-user-store";
 
 interface PreferencesFormProps {
   currentPreferences: UserPreferences;
@@ -26,6 +27,7 @@ const defaultDietaryOptions = ["Vegetarian", "Vegan", "Gluten-Free", "Dairy-Free
 const defaultGoalOptions = ["Lose Weight", "Gain Muscle", "Maintain Weight", "Improve Endurance", "Eat Healthier"];
 
 export function PreferencesForm({ currentPreferences, onSave }: PreferencesFormProps) {
+  const { savePreferences } = useUserStore();
   const {
     control,
     handleSubmit,
@@ -51,11 +53,13 @@ export function PreferencesForm({ currentPreferences, onSave }: PreferencesFormP
   }, [currentPreferences, reset]);
 
   const onSubmit = (data: z.infer<typeof preferencesSchema>) => {
-    onSave({
+    const newPreferences = {
         ...data,
         likes: Array.isArray(data.likes) ? data.likes : data.likes.split(',').map(s => s.trim()).filter(Boolean),
         dislikes: Array.isArray(data.dislikes) ? data.dislikes : data.dislikes.split(',').map(s => s.trim()).filter(Boolean),
-    });
+    };
+    savePreferences(newPreferences);
+    onSave(newPreferences);
   };
 
   return (
