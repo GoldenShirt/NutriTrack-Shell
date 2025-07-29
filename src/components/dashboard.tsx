@@ -9,17 +9,19 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { NutritionChat } from "@/components/nutrition-chat";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Bot, Sparkles } from "lucide-react";
+import { Bot, Sparkles, Settings } from "lucide-react";
 import { useUserStore } from "@/hooks/use-user-store";
 import { calculateGoalsAction } from "@/app/actions";
 import { DEFAULT_GOALS } from "@/lib/constants";
-import type { DailyGoals } from "@/lib/types";
+import type { DailyGoals, UserPreferences } from "@/lib/types";
+import { PreferencesForm } from "./preferences-form";
 
 
 export function Dashboard() {
   const { meals, isInitialized: isMealsInitialized } = useMealStore();
-  const { preferences, isInitialized: isUserInitialized } = useUserStore();
+  const { preferences, savePreferences, isInitialized: isUserInitialized } = useUserStore();
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [isPreferencesOpen, setIsPreferencesOpen] = useState(false);
   const [dailyGoals, setDailyGoals] = useState<DailyGoals>(DEFAULT_GOALS);
   const [isLoadingGoals, setIsLoadingGoals] = useState(true);
 
@@ -28,34 +30,40 @@ export function Dashboard() {
     (meal) => meal.date.split("T")[0] === today
   );
 
-  useEffect(() => {
-    const getGoals = async () => {
-      if (isUserInitialized) {
-        setIsLoadingGoals(true);
-        try {
-          if(preferences.age && preferences.weight && preferences.height && preferences.sex && preferences.activityLevel) {
-            const goals = await calculateGoalsAction({
-              age: preferences.age,
-              weight: preferences.weight,
-              height: preferences.height,
-              sex: preferences.sex,
-              activityLevel: preferences.activityLevel,
-              healthGoals: preferences.healthGoals
-            });
-            setDailyGoals(goals);
-          } else {
-            setDailyGoals(DEFAULT_GOALS);
-          }
-        } catch (error) {
-          console.error("Failed to calculate goals", error);
+  const getGoals = useCallback(async () => {
+    if (isUserInitialized) {
+      setIsLoadingGoals(true);
+      try {
+        if(preferences.age && preferences.weight && preferences.height && preferences.sex && preferences.activityLevel) {
+          const goals = await calculateGoalsAction({
+            age: preferences.age,
+            weight: preferences.weight,
+            height: preferences.height,
+            sex: preferences.sex,
+            activityLevel: preferences.activityLevel,
+            healthGoals: preferences.healthGoals
+          });
+          setDailyGoals(goals);
+        } else {
           setDailyGoals(DEFAULT_GOALS);
-        } finally {
-          setIsLoadingGoals(false);
         }
+      } catch (error) {
+        console.error("Failed to calculate goals", error);
+        setDailyGoals(DEFAULT_GOALS);
+      } finally {
+        setIsLoadingGoals(false);
       }
-    };
-    getGoals();
+    }
   }, [isUserInitialized, preferences]);
+
+  useEffect(() => {
+    getGoals();
+  }, [getGoals]);
+
+  const handlePreferencesSave = (newPreferences: UserPreferences) => {
+    savePreferences(newPreferences);
+    setIsPreferencesOpen(false);
+  };
 
   if (!isMealsInitialized) {
     return (
@@ -73,27 +81,43 @@ export function Dashboard() {
 
   return (
     <div className="grid auto-rows-max items-start gap-4 md:gap-8 lg:col-span-2">
-      <Dialog open={isChatOpen} onOpenChange={setIsChatOpen}>
-        <DialogTrigger asChild>
-          <Button variant="outline" className="h-14 w-full justify-start rounded-lg bg-card px-4 text-left text-muted-foreground shadow-sm hover:bg-card">
-            <Sparkles className="mr-3 h-5 w-5 text-primary" />
-            Ask your AI nutrition coach...
-          </Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-xl h-[70vh] flex flex-col p-0">
-          <DialogHeader className="p-6 pb-2">
-            <DialogTitle>
-                <div className="flex items-center gap-2 font-headline text-xl">
-                    <Bot className="h-6 w-6 text-primary" />
-                    <span>AI Nutrition Coach</span>
-                </div>
-            </DialogTitle>
-          </DialogHeader>
-          <div className="flex-1 overflow-hidden border-t">
-            <NutritionChat />
-          </div>
-        </DialogContent>
-      </Dialog>
+      <div className="flex justify-between gap-2">
+        <Dialog open={isChatOpen} onOpenChange={setIsChatOpen}>
+          <DialogTrigger asChild>
+            <Button variant="outline" className="h-14 w-full justify-start rounded-lg bg-card px-4 text-left text-muted-foreground shadow-sm hover:bg-card">
+              <Sparkles className="mr-3 h-5 w-5 text-primary" />
+              Ask your AI nutrition coach...
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-xl h-[70vh] flex flex-col p-0">
+            <DialogHeader className="p-6 pb-2">
+              <DialogTitle>
+                  <div className="flex items-center gap-2 font-headline text-xl">
+                      <Bot className="h-6 w-6 text-primary" />
+                      <span>AI Nutrition Coach</span>
+                  </div>
+              </DialogTitle>
+            </DialogHeader>
+            <div className="flex-1 overflow-hidden border-t">
+              <NutritionChat />
+            </div>
+          </DialogContent>
+        </Dialog>
+        <Dialog open={isPreferencesOpen} onOpenChange={setIsPreferencesOpen}>
+          <DialogTrigger asChild>
+              <Button variant="outline" size="icon" className="h-14 w-14 flex-shrink-0">
+                  <Settings className="h-6 w-6" />
+                  <span className="sr-only">Preferences</span>
+              </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-lg">
+              <DialogHeader>
+                  <DialogTitle>Your Preferences</DialogTitle>
+              </DialogHeader>
+              <PreferencesForm currentPreferences={preferences} onSave={handlePreferencesSave} />
+          </DialogContent>
+        </Dialog>
+      </div>
 
       {isLoadingGoals ? (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

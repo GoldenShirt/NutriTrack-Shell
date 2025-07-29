@@ -13,8 +13,6 @@ import { useUserStore } from "@/hooks/use-user-store";
 import type { ChatMessage, Meal, UserPreferences } from "@/lib/types";
 import { nutritionChatAction } from "@/app/actions";
 import { cn } from "@/lib/utils";
-import { PreferencesForm } from "./preferences-form";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog";
 
 function formatMealHistory(meals: Meal[]): string {
     if (meals.length === 0) {
@@ -36,7 +34,6 @@ export function NutritionChat() {
   const [isLoading, setIsLoading] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const isInitialMessageFetched = useRef(false);
-  const [isPreferencesOpen, setIsPreferencesOpen] = useState(false);
 
   const isInitialized = isMealsInitialized && isUserInitialized;
 
@@ -48,19 +45,6 @@ export function NutritionChat() {
         }
     }
   }, [messages]);
-
-  const handlePreferencesSave = (newPreferences: UserPreferences) => {
-    setPreferences(newPreferences);
-    setIsPreferencesOpen(false);
-    
-    // Kick off a new conversation with the updated preferences
-    const welcomeMessage: ChatMessage = {
-      id: Date.now().toString(),
-      role: "assistant",
-      message: "Thanks for setting your preferences! How can I help you plan your meals or improve your diet?",
-    };
-    setMessages([welcomeMessage]);
-  };
 
   useEffect(() => {
     if (isInitialized && !isInitialMessageFetched.current) {
@@ -174,7 +158,6 @@ export function NutritionChat() {
               <div className="text-center text-sm text-muted-foreground p-8 flex flex-col items-center gap-4">
                 <Sparkles className="h-6 w-6 text-primary" />
                 <p>Welcome! Let's set your nutrition goals to get started.</p>
-                <Button onClick={() => setIsPreferencesOpen(true)}>Set Preferences</Button>
               </div>
           )}
           {messages.length === 0 && !isLoading && hasPreferences && (
@@ -235,21 +218,6 @@ export function NutritionChat() {
             className="flex-1"
             disabled={isLoading || !isInitialized}
           />
-           <Dialog open={isPreferencesOpen} onOpenChange={setIsPreferencesOpen}>
-            <DialogTrigger asChild>
-                <Button type="button" variant="ghost" size="icon" disabled={isLoading}>
-                    <Settings className="h-4 w-4" />
-                    <span className="sr-only">Preferences</span>
-                </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-lg">
-                <DialogHeader>
-                    <DialogTitle>Your Preferences</DialogTitle>
-                </DialogHeader>
-                <PreferencesForm currentPreferences={preferences} onSave={handlePreferencesSave} />
-            </DialogContent>
-           </Dialog>
-
           <Button type="submit" size="icon" disabled={isLoading || !input.trim() || !isInitialized}>
             {isLoading && messages.length > 0 ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
             <span className="sr-only">Send</span>
