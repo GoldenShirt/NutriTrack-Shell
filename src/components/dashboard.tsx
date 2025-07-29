@@ -57,7 +57,7 @@ export function Dashboard() {
     getGoals();
   }, [isUserInitialized, preferences]);
 
-  if (!isMealsInitialized || isLoadingGoals) {
+  if (!isMealsInitialized) {
     return (
       <div className="space-y-4">
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -95,7 +95,16 @@ export function Dashboard() {
         </DialogContent>
       </Dialog>
 
-      <DailySummary meals={todaysMeals} goals={dailyGoals} />
+      {isLoadingGoals ? (
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <Skeleton className="h-[125px]" />
+            <Skeleton className="h-[125px]" />
+            <Skeleton className="h-[125px]" />
+            <Skeleton className="h-[125px]" />
+        </div>
+      ) : (
+        <DailySummary meals={todaysMeals} goals={dailyGoals} />
+      )}
       <div className="grid gap-4">
           <MealList meals={todaysMeals} />
       </div>
