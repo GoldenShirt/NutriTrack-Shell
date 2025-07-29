@@ -6,6 +6,7 @@ import { MealList } from "@/components/meal-list";
 import { Skeleton } from "@/components/ui/skeleton";
 import { NutritionChat } from "@/components/nutrition-chat";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Card } from "@/components/ui/card";
 import { Bot } from "lucide-react";
 
 export function Dashboard() {
@@ -19,7 +20,6 @@ export function Dashboard() {
   if (!isInitialized) {
     return (
       <div className="space-y-4">
-        <Skeleton className="h-24 w-full" />
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
            <Skeleton className="h-32" />
            <Skeleton className="h-32" />
