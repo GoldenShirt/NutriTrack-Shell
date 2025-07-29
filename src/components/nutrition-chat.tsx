@@ -1,7 +1,8 @@
+
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Send, Loader2, User, Bot } from "lucide-react";
+import { Send, Loader2, User, Bot, Sparkles } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -25,17 +26,59 @@ function formatMealHistory(meals: Meal[]): string {
   }  
 
 export function NutritionChat() {
-  const { meals } = useMealStore();
+  const { meals, isInitialized } = useMealStore();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const isInitialMessageFetched = useRef(false);
 
   useEffect(() => {
     if (scrollAreaRef.current) {
         scrollAreaRef.current.scrollTo({ top: scrollAreaRef.current.scrollHeight, behavior: 'smooth' });
     }
   }, [messages]);
+
+  useEffect(() => {
+    if (isInitialized && !isInitialMessageFetched.current) {
+      const getInitialInsights = async () => {
+        setIsLoading(true);
+        isInitialMessageFetched.current = true;
+        try {
+          const sevenDaysAgo = new Date();
+          sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+          const recentMeals = meals.filter(meal => new Date(meal.date) > sevenDaysAgo);
+          const mealHistory = formatMealHistory(recentMeals);
+          
+          let initialPrompt = "Hello! Based on my recent meals, can you give me some quick insights and suggest what I could eat next to meet my goals?";
+          if (recentMeals.length === 0) {
+            initialPrompt = "Hello! I haven't logged any meals yet. Could you give me some suggestions for a healthy breakfast to start my day?";
+          }
+          
+          const response = await nutritionChatAction({ message: initialPrompt, mealHistory });
+          
+          const assistantMessage: ChatMessage = {
+              id: Date.now().toString(),
+              role: "assistant",
+              message: response.response,
+          };
+          setMessages([assistantMessage]);
+        } catch (error) {
+          const errorMessage: ChatMessage = {
+            id: Date.now().toString(),
+            role: "assistant",
+            message: "Sorry, I'm having trouble connecting. Please try again later.",
+          };
+          setMessages([errorMessage]);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+      
+      getInitialInsights();
+    }
+  }, [isInitialized, meals]);
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -81,9 +124,11 @@ export function NutritionChat() {
     <div className="flex h-full flex-col">
       <ScrollArea className="flex-1 p-4" ref={scrollAreaRef}>
         <div className="space-y-6">
-          {messages.length === 0 && (
-              <div className="text-center text-sm text-muted-foreground p-8">
-                Ask me anything about your diet, suggest healthy meals, or get nutrition advice!
+          {messages.length === 0 && !isLoading && (
+              <div className="text-center text-sm text-muted-foreground p-8 flex flex-col items-center gap-2">
+                <Sparkles className="h-6 w-6 text-primary" />
+                <p>Your AI Nutrition Coach is ready.</p>
+                <p>Ask anything about your diet or get meal suggestions!</p>
               </div>
           )}
           {messages.map((msg) => (
@@ -138,7 +183,7 @@ export function NutritionChat() {
             disabled={isLoading}
           />
           <Button type="submit" size="icon" disabled={isLoading || !input.trim()}>
-            {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+            {isLoading && messages.length > 0 ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
             <span className="sr-only">Send</span>
           </Button>
         </form>
