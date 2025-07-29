@@ -35,22 +35,6 @@ export function useUserStore() {
     }
   }, []);
 
-  useEffect(() => {
-    if (isInitialized) {
-        try {
-          const userData = { preferences };
-          localStorage.setItem(STORE_KEY, JSON.stringify(userData));
-        } catch (error) {
-          console.error("Failed to save user data to localStorage", error);
-        }
-    }
-  }, [preferences, isInitialized]);
-
-  const updatePreferences = useCallback((newPreferences: UserPreferences) => {
-    setPreferences(newPreferences);
-  }, []);
-
-  // This ensures that saving preferences always creates a new object reference
   const savePreferences = useCallback((newPreferences: UserPreferences) => {
     const updatedPrefs = {...newPreferences};
     setPreferences(updatedPrefs);
@@ -62,5 +46,5 @@ export function useUserStore() {
       }
   }, []);
 
-  return { preferences, setPreferences: updatePreferences, savePreferences, isInitialized };
+  return { preferences, setPreferences: savePreferences, savePreferences, isInitialized };
 }
