@@ -2,16 +2,19 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Send, Loader2, User, Bot, Sparkles } from "lucide-react";
+import { Send, Loader2, User, Bot, Sparkles, Settings } from "lucide-react";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useMealStore } from "@/hooks/use-meal-store";
-import type { ChatMessage, Meal } from "@/lib/types";
+import { useUserStore } from "@/hooks/use-user-store";
+import type { ChatMessage, Meal, UserPreferences } from "@/lib/types";
 import { nutritionChatAction } from "@/app/actions";
 import { cn } from "@/lib/utils";
+import { PreferencesForm } from "./preferences-form";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog";
 
 function formatMealHistory(meals: Meal[]): string {
     if (meals.length === 0) {
@@ -26,12 +29,16 @@ function formatMealHistory(meals: Meal[]): string {
   }  
 
 export function NutritionChat() {
-  const { meals, isInitialized } = useMealStore();
+  const { meals, isInitialized: isMealsInitialized } = useMealStore();
+  const { preferences, setPreferences, isInitialized: isUserInitialized } = useUserStore();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const isInitialMessageFetched = useRef(false);
+  const [isPreferencesOpen, setIsPreferencesOpen] = useState(false);
+
+  const isInitialized = isMealsInitialized && isUserInitialized;
 
   useEffect(() => {
     if (scrollAreaRef.current) {
@@ -42,23 +49,50 @@ export function NutritionChat() {
     }
   }, [messages]);
 
+  const handlePreferencesSave = (newPreferences: UserPreferences) => {
+    setPreferences(newPreferences);
+    setIsPreferencesOpen(false);
+    
+    // Kick off a new conversation with the updated preferences
+    const welcomeMessage: ChatMessage = {
+      id: Date.now().toString(),
+      role: "assistant",
+      message: "Thanks for setting your preferences! How can I help you plan your meals or improve your diet?",
+    };
+    setMessages([welcomeMessage]);
+  };
+
   useEffect(() => {
     if (isInitialized && !isInitialMessageFetched.current) {
       const getInitialInsights = async () => {
         setIsLoading(true);
         isInitialMessageFetched.current = true;
+        
+        const hasPreferences = preferences.dietaryRestrictions?.length || preferences.healthGoals?.length;
+
+        if (!hasPreferences) {
+          const welcomeMessage: ChatMessage = {
+            id: Date.now().toString(),
+            role: "assistant",
+            message: "Welcome to your AI Nutrition Coach! To give you the best advice, I need to know a little more about you. Please set your dietary preferences and goals.",
+          };
+          setMessages([welcomeMessage]);
+          setIsLoading(false);
+          return;
+        }
+
         try {
           const sevenDaysAgo = new Date();
           sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
           const recentMeals = meals.filter(meal => new Date(meal.date) > sevenDaysAgo);
           const mealHistory = formatMealHistory(recentMeals);
           
-          let initialPrompt = "Hello! Based on my recent meals, can you give me some quick insights and suggest what I could eat next to meet my goals?";
+          let initialPrompt = "Hello! Based on my recent meals and my preferences, can you give me some quick insights and suggest what I could eat next to meet my goals?";
           if (recentMeals.length === 0) {
-            initialPrompt = "Hello! I haven't logged any meals yet. Could you give me some suggestions for a healthy breakfast to start my day?";
+            initialPrompt = "Hello! I haven't logged any meals yet. Based on my preferences, could you give me some suggestions for a healthy breakfast to start my day?";
           }
           
-          const response = await nutritionChatAction({ message: initialPrompt, mealHistory });
+          const response = await nutritionChatAction({ message: initialPrompt, mealHistory, preferences });
           
           const assistantMessage: ChatMessage = {
               id: Date.now().toString(),
@@ -80,7 +114,7 @@ export function NutritionChat() {
       
       getInitialInsights();
     }
-  }, [isInitialized, meals]);
+  }, [isInitialized, meals, preferences]);
 
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -102,7 +136,7 @@ export function NutritionChat() {
         const recentMeals = meals.filter(meal => new Date(meal.date) > sevenDaysAgo);
         const mealHistory = formatMealHistory(recentMeals);
         
-        const response = await nutritionChatAction({ message: input, mealHistory });
+        const response = await nutritionChatAction({ message: input, mealHistory, preferences });
         
         const assistantMessage: ChatMessage = {
             id: (Date.now() + 1).toString(),
@@ -110,6 +144,13 @@ export function NutritionChat() {
             message: response.response,
         };
         setMessages((prev) => [...prev, assistantMessage]);
+        
+        if (response.updatedPreferences) {
+          const newPrefs = { ...preferences };
+          newPrefs.likes = [...new Set([...(newPrefs.likes || []), ...(response.updatedPreferences.likes || [])])];
+          newPrefs.dislikes = [...new Set([...(newPrefs.dislikes || []), ...(response.updatedPreferences.dislikes || [])])];
+          setPreferences(newPrefs);
+        }
 
     } catch (error) {
         const errorMessage: ChatMessage = {
@@ -123,11 +164,20 @@ export function NutritionChat() {
     }
   };
 
+  const hasPreferences = preferences.dietaryRestrictions?.length || preferences.healthGoals?.length;
+
   return (
     <div className="flex h-full flex-col">
       <ScrollArea className="flex-1" ref={scrollAreaRef}>
         <div className="space-y-6 p-4">
-          {messages.length === 0 && !isLoading && (
+          {messages.length === 0 && !isLoading && !hasPreferences && (
+              <div className="text-center text-sm text-muted-foreground p-8 flex flex-col items-center gap-4">
+                <Sparkles className="h-6 w-6 text-primary" />
+                <p>Welcome! Let's set your nutrition goals to get started.</p>
+                <Button onClick={() => setIsPreferencesOpen(true)}>Set Preferences</Button>
+              </div>
+          )}
+          {messages.length === 0 && !isLoading && hasPreferences && (
               <div className="text-center text-sm text-muted-foreground p-8 flex flex-col items-center gap-2">
                 <Sparkles className="h-6 w-6 text-primary" />
                 <p>Your AI Nutrition Coach is ready.</p>
@@ -183,9 +233,24 @@ export function NutritionChat() {
             onChange={(e) => setInput(e.target.value)}
             placeholder="Ask a question..."
             className="flex-1"
-            disabled={isLoading}
+            disabled={isLoading || !isInitialized}
           />
-          <Button type="submit" size="icon" disabled={isLoading || !input.trim()}>
+           <Dialog open={isPreferencesOpen} onOpenChange={setIsPreferencesOpen}>
+            <DialogTrigger asChild>
+                <Button type="button" variant="ghost" size="icon" disabled={isLoading}>
+                    <Settings className="h-4 w-4" />
+                    <span className="sr-only">Preferences</span>
+                </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-lg">
+                <DialogHeader>
+                    <DialogTitle>Your Preferences</DialogTitle>
+                </DialogHeader>
+                <PreferencesForm currentPreferences={preferences} onSave={handlePreferencesSave} />
+            </DialogContent>
+           </Dialog>
+
+          <Button type="submit" size="icon" disabled={isLoading || !input.trim() || !isInitialized}>
             {isLoading && messages.length > 0 ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
             <span className="sr-only">Send</span>
           </Button>

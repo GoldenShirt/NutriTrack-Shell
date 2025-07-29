@@ -11,3 +11,10 @@ export interface ChatMessage {
   role: "user" | "assistant";
   message: string;
 }
+
+export interface UserPreferences {
+  dietaryRestrictions: string[];
+  healthGoals: string[];
+  likes: string[];
+  dislikes: string[];
+}
