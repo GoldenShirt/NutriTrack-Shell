@@ -89,7 +89,7 @@ export function PreferencesForm({ currentPreferences, onSave }: PreferencesFormP
                     <TabsTrigger value="goals">Goals & Diet</TabsTrigger>
                     <TabsTrigger value="prefs">Preferences</TabsTrigger>
                 </TabsList>
-                <ScrollArea className="pr-4 mt-4 max-h-[50vh] overflow-y-auto">
+                <ScrollArea className="pr-4 mt-4 max-h-[50vh]">
                     <TabsContent value="stats" className="space-y-6">
                         <div>
                             <Label className="font-semibold">Your Stats</Label>
@@ -291,3 +291,5 @@ export function PreferencesForm({ currentPreferences, onSave }: PreferencesFormP
     </Form>
   );
 }
+
+    
