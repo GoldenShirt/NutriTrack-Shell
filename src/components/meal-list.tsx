@@ -49,8 +49,8 @@ export function MealList({ meals, date }: MealListProps) {
         <CardTitle className="font-headline">{dateLabel}</CardTitle>
       </CardHeader>
       <CardContent>
-        <ScrollArea className="h-auto max-h-[400px] pr-4">
-          <Accordion type="multiple" className="w-full space-y-4">
+        <ScrollArea className="h-auto max-h-[400px]">
+          <Accordion type="multiple" className="w-full space-y-4 pr-4">
             {meals.map((meal) => (
               <AccordionItem key={meal.id} value={meal.id} className={cn("relative rounded-lg border bg-card p-4 pr-10", meal.status === 'pending' && "opacity-60")}>
                 <AlertDialog>
