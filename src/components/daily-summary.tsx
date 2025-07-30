@@ -15,9 +15,6 @@ interface DailySummaryProps {
 }
 
 export function DailySummary({ meals, goals }: DailySummaryProps) {
-  // Mobile-first approach:
-  // - All interactions must feel native on touch devices.
-  // - UI elements like navigation arrows must be always visible and accessible on mobile.
   const [view, setView] = useState<'macros' | 'micros'>('macros');
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
   const [touchEndX, setTouchEndX] = useState<number | null>(null);
@@ -36,6 +33,7 @@ export function DailySummary({ meals, goals }: DailySummaryProps) {
   const toggleView = (e?: MouseEvent<HTMLButtonElement>) => {
     setView(v => v === 'macros' ? 'micros' : 'macros');
     if (e) {
+      // This is a common pattern to prevent the button from staying in a focused/active state after being clicked, especially on mobile.
       e.currentTarget.blur();
     }
   }
@@ -110,11 +108,10 @@ export function DailySummary({ meals, goals }: DailySummaryProps) {
   );
 
   const renderMicros = () => (
-    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-5 gap-4 p-1">
+    <div className="grid grid-cols-2 grid-rows-3 sm:grid-cols-3 sm:grid-rows-2 md:grid-cols-3 lg:grid-cols-5 gap-4 p-1">
       {microStats.map((stat, index) => (
-         <div key={stat.title} className={cn("w-full", {
-            "col-span-2 sm:col-span-1 sm:col-start-2 lg:col-start-auto md:col-start-auto": index === 2 && microStats.length === 5,
-            "sm:col-start-1 md:col-start-auto": index === 3 && microStats.length === 5
+        <div key={stat.title} className={cn({
+            "sm:col-start-2": index === 2 && microStats.length === 5,
          })}>
           <Card className="shadow-sm w-full h-full">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -145,7 +142,7 @@ export function DailySummary({ meals, goals }: DailySummaryProps) {
         size="icon" 
         onClick={toggleView}
         className={cn(
-            "absolute -left-3 top-1/2 -translate-y-1/2 z-10 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity"
+            "absolute -left-3 top-1/2 -translate-y-1/2 z-10 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity no-tap-highlight"
         )}
       >
         <ArrowLeft className="h-4 w-4" />
@@ -155,7 +152,7 @@ export function DailySummary({ meals, goals }: DailySummaryProps) {
         size="icon" 
         onClick={toggleView} 
         className={cn(
-            "absolute -right-3 top-1/2 -translate-y-1/2 z-10 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity"
+            "absolute -right-3 top-1/2 -translate-y-1/2 z-10 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity no-tap-highlight"
         )}
       >
           <ArrowRight className="h-4 w-4" />
