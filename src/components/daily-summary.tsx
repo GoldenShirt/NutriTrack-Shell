@@ -1,12 +1,12 @@
 
 "use client";
 
-import { Apple, Beef, Cookie, CookingPot, Leaf, Droplets, Wind, ShieldCheck, Bone } from "lucide-react";
+import { Apple, Beef, Cookie, CookingPot, Leaf, Droplets, Wind, ShieldCheck, Bone, ArrowLeftRight } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import type { DailyGoals, Meal } from "@/lib/types";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+import { Button } from "./ui/button";
 
 interface DailySummaryProps {
   meals: Meal[];
@@ -14,6 +14,8 @@ interface DailySummaryProps {
 }
 
 export function DailySummary({ meals, goals }: DailySummaryProps) {
+  const [view, setView] = useState<'macros' | 'micros'>('macros');
+
   const summary = useMemo(() => {
     return meals.reduce(
       (acc, meal) => {
@@ -47,51 +49,57 @@ export function DailySummary({ meals, goals }: DailySummaryProps) {
     { title: "Vitamin D", value: summary.vitaminD, goal: goals.vitaminD, unit: "mcg", icon: ShieldCheck, color: "text-yellow-400" },
   ];
 
+  const toggleView = () => {
+    setView(current => current === 'macros' ? 'micros' : 'macros');
+  }
 
   return (
-    <Carousel opts={{ loop: true }} className="w-full">
-      <CarouselContent>
-        <CarouselItem>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {macroStats.map((stat) => (
+    <div className="w-full">
+        <div className="flex justify-between items-center mb-2 px-1">
+            <h3 className="font-headline text-lg capitalize">{view}</h3>
+            <Button variant="ghost" size="sm" onClick={toggleView}>
+                <ArrowLeftRight className="h-4 w-4 mr-2" />
+                Switch to {view === 'macros' ? 'Micros' : 'Macros'}
+            </Button>
+        </div>
+      {view === 'macros' ? (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {macroStats.map((stat) => (
+            <Card key={stat.title} className="shadow-sm">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
+                <stat.icon className={`h-4 w-4 text-muted-foreground ${stat.color}`} />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {stat.value.toFixed(0)}
+                  <span className="text-xs text-muted-foreground">/{stat.goal}{stat.unit}</span>
+                </div>
+                <Progress value={(stat.goal > 0 ? (stat.value / stat.goal) * 100 : 0)} className="mt-2 h-2" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+           {microStats.map((stat) => (
               <Card key={stat.title} className="shadow-sm">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
                   <stat.icon className={`h-4 w-4 text-muted-foreground ${stat.color}`} />
-                </CardHeader>
-                <CardContent>
+                  </CardHeader>
+                  <CardContent>
                   <div className="text-2xl font-bold">
-                    {stat.value.toFixed(0)}
-                    <span className="text-xs text-muted-foreground">/{stat.goal}{stat.unit}</span>
+                      {stat.value.toFixed(1)}
+                      <span className="text-xs text-muted-foreground">/{stat.goal}{stat.unit}</span>
                   </div>
-                  <Progress value={(stat.goal > 0 ? (stat.value / stat.goal) * 100 : 0)} className="mt-2 h-2" />
-                </CardContent>
+                  <Progress value={stat.goal > 0 ? (stat.value / stat.goal) * 100 : 0} className="mt-2 h-2" />
+                  </CardContent>
               </Card>
-            ))}
-          </div>
-        </CarouselItem>
-        <CarouselItem>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-5 gap-4">
-             {microStats.map((stat) => (
-                <Card key={stat.title} className="shadow-sm">
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
-                    <stat.icon className={`h-4 w-4 text-muted-foreground ${stat.color}`} />
-                    </CardHeader>
-                    <CardContent>
-                    <div className="text-2xl font-bold">
-                        {stat.value.toFixed(1)}
-                        <span className="text-xs text-muted-foreground">/{stat.goal}{stat.unit}</span>
-                    </div>
-                    <Progress value={stat.goal > 0 ? (stat.value / stat.goal) * 100 : 0} className="mt-2 h-2" />
-                    </CardContent>
-                </Card>
-            ))}
-          </div>
-        </CarouselItem>
-      </CarouselContent>
-      <CarouselPrevious />
-      <CarouselNext />
-    </Carousel>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }
+
