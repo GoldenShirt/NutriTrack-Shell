@@ -9,25 +9,47 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { NutritionChat } from "@/components/nutrition-chat";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Bot, Sparkles, Settings } from "lucide-react";
+import { Bot, Sparkles, Settings, ArrowLeft, ArrowRight, Calendar as CalendarIcon } from "lucide-react";
 import { useUserStore } from "@/hooks/use-user-store";
 import { calculateGoalsAction } from "@/app/actions";
 import { DEFAULT_GOALS } from "@/lib/constants";
 import type { DailyGoals, UserPreferences } from "@/lib/types";
 import { PreferencesForm } from "./preferences-form";
+import { format, isToday } from "date-fns";
 
 
 export function Dashboard() {
   const { meals, isInitialized: isMealsInitialized } = useMealStore();
-  const { preferences, savePreferences, isInitialized: isUserInitialized } = useUserStore();
+  const { preferences, isInitialized: isUserInitialized } = useUserStore();
+  
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isPreferencesOpen, setIsPreferencesOpen] = useState(false);
+  
   const [dailyGoals, setDailyGoals] = useState<DailyGoals>(DEFAULT_GOALS);
   const [isLoadingGoals, setIsLoadingGoals] = useState(true);
 
-  const today = new Date().toISOString().split("T")[0];
-  const todaysMeals = meals.filter(
-    (meal) => meal.date.split("T")[0] === today
+  const [currentDate, setCurrentDate] = useState(new Date());
+
+  const handlePreviousDay = () => {
+    const newDate = new Date(currentDate);
+    newDate.setDate(newDate.getDate() - 1);
+    setCurrentDate(newDate);
+  };
+
+  const handleNextDay = () => {
+    const newDate = new Date(currentDate);
+    newDate.setDate(newDate.getDate() + 1);
+    setCurrentDate(newDate);
+  };
+  
+  const handleBackToToday = () => {
+      setCurrentDate(new Date());
+  }
+
+  const selectedDateStr = format(currentDate, "yyyy-MM-dd");
+
+  const mealsForSelectedDate = meals.filter(
+    (meal) => format(new Date(meal.date), "yyyy-MM-dd") === selectedDateStr
   );
 
   const getGoals = useCallback(async () => {
@@ -61,11 +83,12 @@ export function Dashboard() {
   }, [getGoals]);
 
   const handlePreferencesSave = (newPreferences: UserPreferences) => {
-    savePreferences(newPreferences);
+    // The userStore hook handles saving. We just need to close the dialog.
     setIsPreferencesOpen(false);
+    // getGoals will be re-triggered by the useEffect dependency on `preferences`
   };
 
-  if (!isMealsInitialized) {
+  if (!isMealsInitialized || !isUserInitialized) {
     return (
       <div className="space-y-4">
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -78,6 +101,8 @@ export function Dashboard() {
       </div>
     )
   }
+  
+  const isViewingToday = isToday(currentDate);
 
   return (
     <div className="grid auto-rows-max items-start gap-4 md:gap-8 lg:col-span-2">
@@ -119,6 +144,24 @@ export function Dashboard() {
         </Dialog>
       </div>
 
+       <div className="flex items-center justify-center gap-4">
+        <Button variant="outline" size="icon" onClick={handlePreviousDay}>
+          <ArrowLeft className="h-4 w-4" />
+        </Button>
+        <div className="text-center font-headline text-lg">
+            {format(currentDate, "eeee, MMMM d")}
+        </div>
+        <Button variant="outline" size="icon" onClick={handleNextDay} disabled={isViewingToday}>
+          <ArrowRight className="h-4 w-4" />
+        </Button>
+        {!isViewingToday && (
+            <Button variant="outline" onClick={handleBackToToday} className="h-10">
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                Today
+            </Button>
+        )}
+      </div>
+
       {isLoadingGoals ? (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <Skeleton className="h-[125px]" />
@@ -127,10 +170,10 @@ export function Dashboard() {
             <Skeleton className="h-[125px]" />
         </div>
       ) : (
-        <DailySummary meals={todaysMeals} goals={dailyGoals} />
+        <DailySummary meals={mealsForSelectedDate} goals={dailyGoals} />
       )}
       <div className="grid gap-4">
-          <MealList meals={todaysMeals} />
+          <MealList meals={mealsForSelectedDate} date={currentDate} />
       </div>
     </div>
   );

@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Apple, Beef, Bone, Cookie, CookingPot, Droplets, Leaf, ShieldCheck, Wind } from "lucide-react";
@@ -6,18 +7,22 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import type { Meal } from "@/lib/types";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { format, isToday } from "date-fns";
 
 interface MealListProps {
   meals: Meal[];
+  date: Date;
 }
 
-export function MealList({ meals }: MealListProps) {
+export function MealList({ meals, date }: MealListProps) {
+  const dateLabel = isToday(date) ? "Today's Meals" : "Meals for " + format(date, "MMMM d");
+  
   if (meals.length === 0) {
     return (
       <Card className="flex h-full min-h-[300px] items-center justify-center shadow-sm">
         <div className="text-center">
-          <p className="text-lg font-semibold">No meals logged today</p>
-          <p className="text-sm text-muted-foreground">Log your first meal to get started!</p>
+          <p className="text-lg font-semibold">No meals logged for this day</p>
+          <p className="text-sm text-muted-foreground">Log a meal or select another date.</p>
         </div>
       </Card>
     );
@@ -26,7 +31,7 @@ export function MealList({ meals }: MealListProps) {
   return (
     <Card className="shadow-sm">
       <CardHeader>
-        <CardTitle className="font-headline">Today's Meals</CardTitle>
+        <CardTitle className="font-headline">{dateLabel}</CardTitle>
       </CardHeader>
       <CardContent>
         <ScrollArea className="h-[340px] pr-4">
