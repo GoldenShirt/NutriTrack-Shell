@@ -5,7 +5,7 @@ import { Apple, Beef, Bone, Cookie, CookingPot, Droplets, Leaf, ShieldCheck, Win
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import type { DailyGoals, Meal } from "@/lib/types";
-import { useMemo, useState, TouchEvent } from "react";
+import { useMemo, useState, type TouchEvent } from "react";
 import { Button } from "./ui/button";
 import { cn } from "@/lib/utils";
 
@@ -107,7 +107,8 @@ export function DailySummary({ meals, goals }: DailySummaryProps) {
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-5 gap-4 p-1">
       {microStats.map((stat, index) => (
          <div key={stat.title} className={cn("w-full", {
-            "col-span-2 sm:col-span-1 sm:col-start-2 md:col-start-2 lg:col-start-auto": index === 2 && microStats.length === 5
+            "col-span-2 sm:col-span-1 sm:col-start-2 md:col-start-auto lg:col-start-auto": index === 2 && microStats.length === 5,
+            "sm:col-start-1 md:col-start-auto": index === 3 && microStats.length === 5
          })}>
           <Card className="shadow-sm w-full h-full">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -136,10 +137,11 @@ export function DailySummary({ meals, goals }: DailySummaryProps) {
       <Button 
         variant="outline" 
         size="icon" 
-        onClick={toggleView} 
+        onClick={toggleView}
+        onTouchCancel={(e) => (e.target as HTMLElement).blur()}
         className={cn(
-            "absolute -left-3 top-1/2 -translate-y-1/2 z-10 sm:opacity-0 transition-opacity",
-             "sm:group-hover:opacity-100 flex"
+            "absolute -left-3 top-1/2 -translate-y-1/2 z-10 opacity-0 transition-opacity",
+             "group-hover:opacity-100 flex sm:opacity-100"
         )}
       >
         <ArrowLeft className="h-4 w-4" />
@@ -148,9 +150,10 @@ export function DailySummary({ meals, goals }: DailySummaryProps) {
         variant="outline" 
         size="icon" 
         onClick={toggleView} 
+        onTouchCancel={(e) => (e.target as HTMLElement).blur()}
         className={cn(
-            "absolute -right-3 top-1/2 -translate-y-1/2 z-10 sm:opacity-0 transition-opacity",
-            "sm:group-hover:opacity-100 flex"
+            "absolute -right-3 top-1/2 -translate-y-1/2 z-10 opacity-0 transition-opacity",
+            "group-hover:opacity-100 flex sm:opacity-100"
         )}
       >
           <ArrowRight className="h-4 w-4" />
