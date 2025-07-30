@@ -12,10 +12,8 @@
 // - CalculateGoalsOutput: The output type for the calculateGoals function.
 'use server';
 
-import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import { z } from 'genkit';
 import { CalculateGoalsOutputSchema } from '@/lib/types';
-
 
 const CalculateGoalsInputSchema = z.object({
   age: z.number().describe('The age of the user in years.'),
@@ -32,64 +30,73 @@ export type CalculateGoalsOutput = z.infer<typeof CalculateGoalsOutputSchema>;
 
 
 export async function calculateGoals(input: CalculateGoalsInput): Promise<CalculateGoalsOutput> {
-  return calculateGoalsFlow(input);
+    const { age, sex, height, weight, activityLevel, healthGoals = [] } = input;
+
+    // 1. Calculate BMR
+    let bmr: number;
+    const baseBmrCalc = 10 * weight + 6.25 * height - 5 * age;
+    if (sex === 'male') {
+        bmr = baseBmrCalc + 5;
+    } else if (sex === 'female') {
+        bmr = baseBmrCalc - 161;
+    } else { // 'other'
+        const bmrMale = baseBmrCalc + 5;
+        const bmrFemale = baseBmrCalc - 161;
+        bmr = (bmrMale + bmrFemale) / 2;
+    }
+
+    // 2. Calculate TDEE
+    const activityFactors = {
+        sedentary: 1.2,
+        light: 1.375,
+        moderate: 1.55,
+        active: 1.725,
+        very_active: 1.9,
+    };
+    const tdee = bmr * activityFactors[activityLevel];
+
+    // 3. Adjust TDEE for calorie goal
+    let calorieGoal = tdee;
+    if (healthGoals.includes('Lose Weight')) {
+        calorieGoal -= 500;
+    } else if (healthGoals.includes('Gain Muscle')) {
+        calorieGoal += 500;
+    }
+
+    // 4. Determine macronutrient split
+    let macroSplit = { carbs: 0.40, protein: 0.30, fats: 0.30 }; // Default
+    if (healthGoals.includes('Lose Weight')) {
+        macroSplit = { carbs: 0.35, protein: 0.40, fats: 0.25 };
+    } else if (healthGoals.includes('Gain Muscle')) {
+        macroSplit = { carbs: 0.45, protein: 0.35, fats: 0.20 };
+    }
+
+    // 5. Calculate grams for each macronutrient
+    const proteinGrams = (calorieGoal * macroSplit.protein) / 4;
+    const carbsGrams = (calorieGoal * macroSplit.carbs) / 4;
+    const fatsGrams = (calorieGoal * macroSplit.fats) / 9;
+
+    // 6. Calculate micronutrient goals
+    const effectiveSexForMicros = (sex === 'other' || sex === 'male') ? 'male' : 'female';
+
+    const calcium = age > 50 && effectiveSexForMicros === 'female' ? 1200 : (age > 70 && effectiveSexForMicros === 'male' ? 1200 : 1000);
+    const iron = effectiveSexForMicros === 'female' && age >= 19 && age <= 50 ? 18 : 8;
+    const potassium = effectiveSexForMicros === 'male' ? 3400 : 2600;
+    const vitaminC = effectiveSexForMicros === 'male' ? 90 : 75;
+    const vitaminD = age > 70 ? 20 : 15;
+
+    const result: CalculateGoalsOutput = {
+        calories: Math.round(calorieGoal),
+        protein: Math.round(proteinGrams),
+        carbs: Math.round(carbsGrams),
+        fats: Math.round(fatsGrams),
+        calcium: Math.round(calcium),
+        iron: Math.round(iron),
+        potassium: Math.round(potassium),
+        vitaminC: Math.round(vitaminC),
+        vitaminD: Math.round(vitaminD),
+    };
+    
+    // Ensure the function returns a promise
+    return Promise.resolve(result);
 }
-
-const prompt = ai.definePrompt({
-  name: 'calculateGoalsPrompt',
-  input: {schema: CalculateGoalsInputSchema},
-  output: {schema: CalculateGoalsOutputSchema},
-  prompt: `You are an expert nutritionist. Your task is to calculate personalized daily nutritional goals based on user-provided data.
-
-  User Data:
-  - Age: {{{age}}} years
-  - Sex: {{{sex}}}
-  - Height: {{{height}}} cm
-  - Weight: {{{weight}}} kg
-  - Activity Level: {{{activityLevel}}}
-  - Health Goals: {{#if healthGoals}}{{#each healthGoals}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}{{else}}None specified.{{/if}}
-
-  MACRONUTRIENT INSTRUCTIONS:
-  1.  Calculate Basal Metabolic Rate (BMR) using the Mifflin-St Jeor equation:
-      - For males: BMR = 10 * weight (kg) + 6.25 * height (cm) - 5 * age (y) + 5
-      - For females: BMR = 10 * weight (kg) + 6.25 * height (cm) - 5 * age (y) - 161
-      - If sex is 'other', use the average of the male and female formulas.
-  2.  Calculate Total Daily Energy Expenditure (TDEE) by multiplying BMR by the appropriate activity factor:
-      - sedentary: 1.2
-      - light: 1.375
-      - moderate: 1.55
-      - active: 1.725
-      - very_active: 1.9
-  3.  Adjust TDEE for calorie goal:
-      - If healthGoals includes 'Lose Weight', subtract 500 calories.
-      - If healthGoals includes 'Gain Muscle' (and not 'Lose Weight'), add 500 calories.
-      - Otherwise, use TDEE.
-  4.  Determine macronutrient split based on goals:
-      - If healthGoals includes 'Lose Weight': 35% carbs, 40% protein, 25% fats.
-      - If healthGoals includes 'Gain Muscle': 45% carbs, 35% protein, 20% fats.
-      - Default ('Maintain Weight' etc.): 40% carbs, 30% protein, 30% fats.
-  5.  Calculate grams for each macronutrient (Protein/Carbs: 4 cal/g, Fats: 9 cal/g).
-
-  MICRONUTRIENT INSTRUCTIONS:
-  1.  Calculate daily micronutrient goals based on the user's age and sex. Use the following general Recommended Dietary Allowances (RDAs).
-      - Calcium (mg): 1000 for adults 19-50. 1200 for women 51+ and men 71+.
-      - Iron (mg): 8 for adult men and women 51+. 18 for women 19-50.
-      - Potassium (mg): 3400 for adult men. 2600 for adult women.
-      - Vitamin C (mg): 90 for adult men. 75 for adult women.
-      - Vitamin D (mcg): 15 for adults up to age 70. 20 for adults over 70.
-  2.  If sex is 'other', use the male recommendations.
-
-  Return the final calculated goals as a JSON object, with all values as numbers, rounded to the nearest whole number.`,
-});
-
-const calculateGoalsFlow = ai.defineFlow(
-  {
-    name: 'calculateGoalsFlow',
-    inputSchema: CalculateGoalsInputSchema,
-    outputSchema: CalculateGoalsOutputSchema,
-  },
-  async input => {
-    const {output} = await prompt(input);
-    return output!;
-  }
-);
