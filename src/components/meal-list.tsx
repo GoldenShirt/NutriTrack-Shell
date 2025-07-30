@@ -48,11 +48,11 @@ export function MealList({ meals, date }: MealListProps) {
       <CardHeader>
         <CardTitle className="font-headline">{dateLabel}</CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-0.5">
         <ScrollArea className="h-auto max-h-[400px]">
-          <Accordion type="multiple" className="w-full space-y-4 pr-4">
+          <Accordion type="multiple" className="w-full space-y-1">
             {meals.map((meal) => (
-              <AccordionItem key={meal.id} value={meal.id} className={cn("relative rounded-lg border bg-card p-4 pr-10", meal.status === 'pending' && "opacity-60")}>
+              <AccordionItem key={meal.id} value={meal.id} className={cn("relative rounded-lg border bg-card p-3 pr-10", meal.status === 'pending' && "opacity-60")}>
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
                     <Button variant="ghost" size="icon" className="absolute top-2 right-1 h-7 w-7">
