@@ -29,6 +29,10 @@ export function DailySummary({ meals, goals }: DailySummaryProps) {
   const handleTouchMove = (e: TouchEvent) => {
     setTouchEndX(e.targetTouches[0].clientX);
   };
+  
+  const toggleView = () => {
+    setView(v => v === 'macros' ? 'micros' : 'macros');
+  }
 
   const handleTouchEnd = () => {
     if (!touchStartX || !touchEndX) return;
@@ -36,10 +40,8 @@ export function DailySummary({ meals, goals }: DailySummaryProps) {
     const isLeftSwipe = distance > minSwipeDistance;
     const isRightSwipe = distance < -minSwipeDistance;
 
-    if (isLeftSwipe) {
-      setView('micros');
-    } else if (isRightSwipe) {
-      setView('macros');
+    if (isLeftSwipe || isRightSwipe) {
+      toggleView();
     }
 
     setTouchStartX(null);
@@ -80,13 +82,6 @@ export function DailySummary({ meals, goals }: DailySummaryProps) {
     { title: "Vitamin D", value: summary.vitaminD, goal: goals.vitaminD, unit: "mcg", icon: ShieldCheck, color: "text-yellow-400" },
   ];
   
-  const toggleView = (direction: 'next' | 'prev') => {
-    if (direction === 'next' && view === 'macros') {
-        setView('micros');
-    } else if (direction === 'prev' && view === 'micros') {
-        setView('macros');
-    }
-  }
 
   const renderMacros = () => (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-1">
@@ -141,12 +136,10 @@ export function DailySummary({ meals, goals }: DailySummaryProps) {
       <Button 
         variant="outline" 
         size="icon" 
-        onClick={() => toggleView('prev')} 
-        disabled={view === 'macros'}
+        onClick={toggleView} 
         className={cn(
-            "absolute -left-3 top-1/2 -translate-y-1/2 z-10 transition-opacity opacity-100",
-             "sm:opacity-0 sm:group-hover:opacity-100 flex",
-             {"disabled:opacity-25 disabled:cursor-not-allowed": view === 'macros'}
+            "absolute -left-3 top-1/2 -translate-y-1/2 z-10 transition-opacity",
+             "sm:opacity-0 sm:group-hover:opacity-100 flex"
         )}
       >
         <ArrowLeft className="h-4 w-4" />
@@ -154,12 +147,10 @@ export function DailySummary({ meals, goals }: DailySummaryProps) {
       <Button 
         variant="outline" 
         size="icon" 
-        onClick={() => toggleView('next')} 
-        disabled={view === 'micros'}
+        onClick={toggleView} 
         className={cn(
-            "absolute -right-3 top-1/2 -translate-y-1/2 z-10 transition-opacity opacity-100",
-            "sm:opacity-0 sm:group-hover:opacity-100 flex",
-            {"disabled:opacity-25 disabled:cursor-not-allowed": view === 'micros'}
+            "absolute -right-3 top-1/2 -translate-y-1/2 z-10 transition-opacity",
+            "sm:opacity-0 sm:group-hover:opacity-100 flex"
         )}
       >
           <ArrowRight className="h-4 w-4" />
