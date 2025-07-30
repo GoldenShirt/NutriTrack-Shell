@@ -138,8 +138,8 @@ export function DailySummary({ meals, goals }: DailySummaryProps) {
         size="icon" 
         onClick={toggleView} 
         className={cn(
-            "absolute -left-3 top-1/2 -translate-y-1/2 z-10 transition-opacity",
-             "sm:opacity-0 sm:group-hover:opacity-100 flex"
+            "absolute -left-3 top-1/2 -translate-y-1/2 z-10 sm:opacity-0 transition-opacity",
+             "sm:group-hover:opacity-100 flex"
         )}
       >
         <ArrowLeft className="h-4 w-4" />
@@ -149,8 +149,8 @@ export function DailySummary({ meals, goals }: DailySummaryProps) {
         size="icon" 
         onClick={toggleView} 
         className={cn(
-            "absolute -right-3 top-1/2 -translate-y-1/2 z-10 transition-opacity",
-            "sm:opacity-0 sm:group-hover:opacity-100 flex"
+            "absolute -right-3 top-1/2 -translate-y-1/2 z-10 sm:opacity-0 transition-opacity",
+            "sm:group-hover:opacity-100 flex"
         )}
       >
           <ArrowRight className="h-4 w-4" />
