@@ -64,14 +64,14 @@ export function DailySummary({ meals, goals }: DailySummaryProps) {
                     {stat.value.toFixed(0)}
                     <span className="text-xs text-muted-foreground">/{stat.goal}{stat.unit}</span>
                   </div>
-                  <Progress value={(stat.value / stat.goal) * 100} className="mt-2 h-2" />
+                  <Progress value={(stat.goal > 0 ? (stat.value / stat.goal) * 100 : 0)} className="mt-2 h-2" />
                 </CardContent>
               </Card>
             ))}
           </div>
         </CarouselItem>
         <CarouselItem>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-5 gap-4">
              {microStats.map((stat) => (
                 <Card key={stat.title} className="shadow-sm">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
