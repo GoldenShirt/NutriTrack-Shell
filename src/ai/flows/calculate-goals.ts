@@ -32,7 +32,7 @@ export type CalculateGoalsOutput = z.infer<typeof CalculateGoalsOutputSchema>;
 export async function calculateGoals(input: CalculateGoalsInput): Promise<CalculateGoalsOutput> {
     const { age, sex, height, weight, activityLevel, healthGoals = [] } = input;
 
-    // 1. Calculate BMR
+    // 1. Calculate BMR (Mifflin-St Jeor Equation)
     let bmr: number;
     const baseBmrCalc = 10 * weight + 6.25 * height - 5 * age;
     if (sex === 'male') {
@@ -40,12 +40,13 @@ export async function calculateGoals(input: CalculateGoalsInput): Promise<Calcul
     } else if (sex === 'female') {
         bmr = baseBmrCalc - 161;
     } else { // 'other'
+        // Average the male and female BMRs for 'other'
         const bmrMale = baseBmrCalc + 5;
         const bmrFemale = baseBmrCalc - 161;
         bmr = (bmrMale + bmrFemale) / 2;
     }
 
-    // 2. Calculate TDEE
+    // 2. Calculate TDEE (Total Daily Energy Expenditure)
     const activityFactors = {
         sedentary: 1.2,
         light: 1.375,
@@ -55,20 +56,27 @@ export async function calculateGoals(input: CalculateGoalsInput): Promise<Calcul
     };
     const tdee = bmr * activityFactors[activityLevel];
 
-    // 3. Adjust TDEE for calorie goal
+    // 3. Adjust TDEE for calorie goal based on a priority of goals
     let calorieGoal = tdee;
     if (healthGoals.includes('Lose Weight')) {
-        calorieGoal -= 500;
+        calorieGoal -= 500; // Prioritize weight loss calorie deficit
     } else if (healthGoals.includes('Gain Muscle')) {
-        calorieGoal += 500;
+        calorieGoal += 300; // More conservative surplus for lean muscle gain
+    } else if (healthGoals.includes('Maintain Weight')) {
+        calorieGoal = tdee; // Explicitly maintain
     }
+    
+    // 4. Determine macronutrient split based on goal combinations
+    let macroSplit = { carbs: 0.45, protein: 0.25, fats: 0.30 }; // Default/Maintain/Eat Healthier
 
-    // 4. Determine macronutrient split
-    let macroSplit = { carbs: 0.40, protein: 0.30, fats: 0.30 }; // Default
     if (healthGoals.includes('Lose Weight')) {
-        macroSplit = { carbs: 0.35, protein: 0.40, fats: 0.25 };
+        macroSplit = { carbs: 0.35, protein: 0.40, fats: 0.25 }; // High protein to preserve muscle
+    } else if (healthGoals.includes('Gain Muscle') && healthGoals.includes('Improve Endurance')) {
+        macroSplit = { carbs: 0.50, protein: 0.30, fats: 0.20 }; // Higher carbs for dual goals
     } else if (healthGoals.includes('Gain Muscle')) {
-        macroSplit = { carbs: 0.45, protein: 0.35, fats: 0.20 };
+        macroSplit = { carbs: 0.45, protein: 0.35, fats: 0.20 }; // High protein and moderate carbs
+    } else if (healthGoals.includes('Improve Endurance')) {
+        macroSplit = { carbs: 0.55, protein: 0.25, fats: 0.20 }; // High carbs for fuel
     }
 
     // 5. Calculate grams for each macronutrient
