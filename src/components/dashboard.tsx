@@ -111,7 +111,7 @@ export function Dashboard() {
   const isViewingToday = isToday(currentDate);
 
   return (
-    <div className="grid auto-rows-max items-start gap-4 md:gap-8 lg:col-span-2">
+    <div className="grid auto-rows-max items-start gap-4 lg:col-span-2">
       <div className="flex justify-between gap-2">
         <Dialog open={isChatOpen} onOpenChange={setIsChatOpen}>
           <DialogTrigger asChild>
@@ -177,10 +177,10 @@ export function Dashboard() {
                 <Skeleton className="h-[125px]" />
                 <Skeleton className="h-[125px]" />
             </div>
-            <Skeleton className="h-auto max-h-[400px] w-full" />
+            <Skeleton className="h-[400px] w-full" />
           </div>
         ) : (
-          <div className="grid gap-4">
+          <div className="grid gap-2 md:gap-4">
             <DailySummary meals={mealsForSelectedDate} goals={dailyGoals} />
             <MealList meals={mealsForSelectedDate} date={currentDate} />
           </div>
