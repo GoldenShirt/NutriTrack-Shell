@@ -20,7 +20,7 @@ import { format, isToday } from "date-fns";
 
 export function Dashboard() {
   const { meals, isInitialized: isMealsInitialized } = useMealStore();
-  const { preferences, isInitialized: isUserInitialized } = useUserStore();
+  const { preferences, isInitialized: isUserInitialized, savePreferences } = useUserStore();
   
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isPreferencesOpen, setIsPreferencesOpen] = useState(false);
@@ -83,9 +83,8 @@ export function Dashboard() {
   }, [getGoals]);
 
   const handlePreferencesSave = (newPreferences: UserPreferences) => {
-    // The userStore hook handles saving. We just need to close the dialog.
+    savePreferences(newPreferences);
     setIsPreferencesOpen(false);
-    // getGoals will be re-triggered by the useEffect dependency on `preferences`
   };
 
   if (!isMealsInitialized || !isUserInitialized) {
@@ -144,36 +143,38 @@ export function Dashboard() {
         </Dialog>
       </div>
 
-       <div className="flex items-center justify-center gap-4">
-        <Button variant="outline" size="icon" onClick={handlePreviousDay}>
-          <ArrowLeft className="h-4 w-4" />
-        </Button>
-        <div className="text-center font-headline text-lg">
-            {format(currentDate, "eeee, MMMM d")}
-        </div>
-        <Button variant="outline" size="icon" onClick={handleNextDay} disabled={isViewingToday}>
-          <ArrowRight className="h-4 w-4" />
-        </Button>
-        {!isViewingToday && (
-            <Button variant="outline" onClick={handleBackToToday} className="h-10">
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                Today
-            </Button>
-        )}
-      </div>
-
-      <div className="space-y-4">
-        {isLoadingGoals ? (
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-              <Skeleton className="h-[125px]" />
-              <Skeleton className="h-[125px]" />
-              <Skeleton className="h-[125px]" />
-              <Skeleton className="h-[125px]" />
+       <div className="grid gap-4">
+        <div className="flex items-center justify-center gap-4">
+          <Button variant="outline" size="icon" onClick={handlePreviousDay}>
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <div className="text-center font-headline text-lg">
+              {format(currentDate, "eeee, MMMM d")}
           </div>
-        ) : (
-          <DailySummary meals={mealsForSelectedDate} goals={dailyGoals} />
-        )}
-        <MealList meals={mealsForSelectedDate} date={currentDate} />
+          <Button variant="outline" size="icon" onClick={handleNextDay} disabled={isViewingToday}>
+            <ArrowRight className="h-4 w-4" />
+          </Button>
+          {!isViewingToday && (
+              <Button variant="outline" onClick={handleBackToToday} className="h-10">
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  Today
+              </Button>
+          )}
+        </div>
+
+        <div className="space-y-4">
+          {isLoadingGoals ? (
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                <Skeleton className="h-[125px]" />
+                <Skeleton className="h-[125px]" />
+                <Skeleton className="h-[125px]" />
+                <Skeleton className="h-[125px]" />
+            </div>
+          ) : (
+            <DailySummary meals={mealsForSelectedDate} goals={dailyGoals} />
+          )}
+          <MealList meals={mealsForSelectedDate} date={currentDate} />
+        </div>
       </div>
     </div>
   );
