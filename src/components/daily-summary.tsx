@@ -36,9 +36,9 @@ export function DailySummary({ meals, goals }: DailySummaryProps) {
     const isLeftSwipe = distance > minSwipeDistance;
     const isRightSwipe = distance < -minSwipeDistance;
 
-    if (isLeftSwipe) {
+    if (isLeftSwipe && view === 'macros') {
       setView('micros');
-    } else if (isRightSwipe) {
+    } else if (isRightSwipe && view === 'micros') {
       setView('macros');
     }
 
@@ -84,67 +84,92 @@ export function DailySummary({ meals, goals }: DailySummaryProps) {
     setView(v);
   }
 
+  const renderMicroCards = () => (
+    <div className="flex flex-wrap justify-center gap-4 p-1">
+      {microStats.map((stat, index) => (
+         <div key={stat.title} className={cn("w-full", {
+           'sm:w-[calc(50%-0.5rem)]': true,
+           'md:w-[calc(33.33%-1rem)]': true,
+           'lg:w-[calc(20%-1rem)]': true
+         })}>
+          <Card className="shadow-sm w-full h-full">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
+              <stat.icon className={`h-4 w-4 text-muted-foreground ${stat.color}`} />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {stat.value.toFixed(1)}
+                <span className="text-xs text-muted-foreground">/{stat.goal}{stat.unit}</span>
+              </div>
+              <Progress value={stat.goal > 0 ? (stat.value / stat.goal) * 100 : 0} className="mt-2 h-2" />
+            </CardContent>
+          </Card>
+        </div>
+      ))}
+    </div>
+  );
+
   return (
-    <div className="w-full relative group" onTouchStart={handleTouchStart} onTouchMove={handleTouchMove} onTouchEnd={handleTouchEnd}>
-        
+    <div className="w-full relative" onTouchStart={handleTouchStart} onTouchMove={handleTouchMove} onTouchEnd={handleTouchEnd}>
+        <div className="relative w-full overflow-hidden">
+            <div
+                className={cn(
+                    "transition-transform duration-300 ease-in-out",
+                    view === 'micros' && "-translate-x-full"
+                )}
+                style={{ display: 'flex', width: '200%' }}
+            >
+                <div className="w-1/2 flex-shrink-0">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-1">
+                        {macroStats.map((stat) => (
+                            <Card key={stat.title} className="shadow-sm">
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
+                                <stat.icon className={`h-4 w-4 text-muted-foreground ${stat.color}`} />
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold">
+                                {stat.value.toFixed(0)}
+                                <span className="text-xs text-muted-foreground">/{stat.goal}{stat.unit}</span>
+                                </div>
+                                <Progress value={(stat.goal > 0 ? (stat.value / stat.goal) * 100 : 0)} className="mt-2 h-2" />
+                            </CardContent>
+                            </Card>
+                        ))}
+                    </div>
+                </div>
+
+                <div className="w-1/2 flex-shrink-0">
+                  {renderMicroCards()}
+                </div>
+            </div>
+        </div>
+
         <Button 
           variant="outline" 
           size="icon" 
           onClick={() => toggleView('macros')} 
-          className={cn("absolute -left-3 top-1/2 -translate-y-1/2 z-10 md:opacity-0 group-hover:opacity-100 transition-opacity", { 'hidden': view === 'macros' })}
+          className={cn(
+              "absolute -left-3 top-1/2 -translate-y-1/2 z-10 transition-opacity",
+               view === 'macros' ? "opacity-0 pointer-events-none" : "opacity-100",
+               "md:opacity-0 md:group-hover:opacity-100"
+          )}
         >
           <ChevronLeft className="h-4 w-4" />
         </Button>
-
-        {view === 'macros' && (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-1">
-                {macroStats.map((stat) => (
-                    <Card key={stat.title} className="shadow-sm">
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
-                        <stat.icon className={`h-4 w-4 text-muted-foreground ${stat.color}`} />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">
-                        {stat.value.toFixed(0)}
-                        <span className="text-xs text-muted-foreground">/{stat.goal}{stat.unit}</span>
-                        </div>
-                        <Progress value={(stat.goal > 0 ? (stat.value / stat.goal) * 100 : 0)} className="mt-2 h-2" />
-                    </CardContent>
-                    </Card>
-                ))}
-            </div>
-        )}
-        
-        {view === 'micros' && (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-5 gap-4 p-1">
-                {microStats.map((stat) => (
-                    <Card key={stat.title} className="shadow-sm">
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
-                        <stat.icon className={`h-4 w-4 text-muted-foreground ${stat.color}`} />
-                        </CardHeader>
-                        <CardContent>
-                        <div className="text-2xl font-bold">
-                            {stat.value.toFixed(1)}
-                            <span className="text-xs text-muted-foreground">/{stat.goal}{stat.unit}</span>
-                        </div>
-                        <Progress value={stat.goal > 0 ? (stat.value / stat.goal) * 100 : 0} className="mt-2 h-2" />
-                        </CardContent>
-                    </Card>
-                ))}
-            </div>
-        )}
-
         <Button 
           variant="outline" 
           size="icon" 
           onClick={() => toggleView('micros')} 
-          className={cn("absolute -right-3 top-1/2 -translate-y-1/2 z-10 md:opacity-0 group-hover:opacity-100 transition-opacity", { 'hidden': view === 'micros' })}
+          className={cn(
+              "absolute -right-3 top-1/2 -translate-y-1/2 z-10 transition-opacity",
+              view === 'micros' ? "opacity-0 pointer-events-none" : "opacity-100",
+              "md:opacity-0 md:group-hover:opacity-100"
+          )}
         >
             <ChevronRight className="h-4 w-4" />
         </Button>
     </div>
   );
 }
-
