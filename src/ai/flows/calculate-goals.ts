@@ -2,7 +2,7 @@
 //
 // It takes user's personal statistics (age, sex, height, weight, activity level)
 // and health goals as input, and returns recommended daily intake for calories,
-// protein, carbs, and fats.
+// protein, carbs, fats, and key micronutrients.
 //
 // Exported functions:
 // - calculateGoals: Calculates personalized daily nutrition goals.
@@ -49,7 +49,7 @@ const prompt = ai.definePrompt({
   - Activity Level: {{{activityLevel}}}
   - Health Goals: {{#if healthGoals}}{{#each healthGoals}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}{{else}}None specified.{{/if}}
 
-  Instructions:
+  MACRONUTRIENT INSTRUCTIONS:
   1.  Calculate Basal Metabolic Rate (BMR) using the Mifflin-St Jeor equation:
       - For males: BMR = 10 * weight (kg) + 6.25 * height (cm) - 5 * age (y) + 5
       - For females: BMR = 10 * weight (kg) + 6.25 * height (cm) - 5 * age (y) - 161
@@ -60,18 +60,24 @@ const prompt = ai.definePrompt({
       - moderate: 1.55
       - active: 1.725
       - very_active: 1.9
-  3.  Adjust the TDEE based on the user's health goals to get the final daily calorie goal:
-      - If healthGoals contains 'Lose Weight', subtract 500 calories.
-      - If healthGoals contains 'Gain Muscle' (and not 'Lose Weight'), add 500 calories.
-      - If neither 'Lose Weight' nor 'Gain Muscle' are in healthGoals, use TDEE as the calorie goal.
-  4.  Determine the macronutrient split based on the health goals and the final calorie goal:
-      - If healthGoals contains 'Lose Weight': 35% carbs, 40% protein, 25% fats.
-      - If healthGoals contains 'Gain Muscle': 45% carbs, 35% protein, 20% fats.
-      - If neither (i.e., 'Maintain Weight' or other goals): 40% carbs, 30% protein, 30% fats.
-  5.  Calculate the grams for each macronutrient:
-      - Protein: 4 calories per gram.
-      - Carbs: 4 calories per gram.
-      - Fats: 9 calories per gram.
+  3.  Adjust TDEE for calorie goal:
+      - If healthGoals includes 'Lose Weight', subtract 500 calories.
+      - If healthGoals includes 'Gain Muscle' (and not 'Lose Weight'), add 500 calories.
+      - Otherwise, use TDEE.
+  4.  Determine macronutrient split based on goals:
+      - 'Lose Weight': 35% carbs, 40% protein, 25% fats.
+      - 'Gain Muscle': 45% carbs, 35% protein, 20% fats.
+      - Default ('Maintain Weight' etc.): 40% carbs, 30% protein, 30% fats.
+  5.  Calculate grams for each macronutrient (Protein/Carbs: 4 cal/g, Fats: 9 cal/g).
+
+  MICRONUTRIENT INSTRUCTIONS:
+  1.  Calculate daily micronutrient goals based on the user's age and sex. Use the following general Recommended Dietary Allowances (RDAs).
+      - Calcium (mg): 1000 for adults 19-50. 1200 for women 51+ and men 71+.
+      - Iron (mg): 8 for adult men and women 51+. 18 for women 19-50.
+      - Potassium (mg): 3400 for adult men. 2600 for adult women.
+      - Vitamin C (mg): 90 for adult men. 75 for adult women.
+      - Vitamin D (mcg): 15 for adults up to age 70. 20 for adults over 70.
+  2.  If sex is 'other', use the male recommendations.
 
   Return the final calculated goals as a JSON object, with all values as numbers, rounded to the nearest whole number.`,
 });

@@ -27,6 +27,11 @@ const AnalyzeMealOutputSchema = z.object({
   carbs: z.number().describe('The estimated carbohydrate content of the meal, in grams.'),
   fats: z.number().describe('The estimated fat content of the meal, in grams.'),
   ingredients: z.array(z.string()).describe('A list of identified ingredients in the meal.'),
+  vitaminC: z.number().optional().describe('The estimated Vitamin C content of the meal, in milligrams (mg).'),
+  vitaminD: z.number().optional().describe('The estimated Vitamin D content of the meal, in micrograms (mcg).'),
+  iron: z.number().optional().describe('The estimated Iron content of the meal, in milligrams (mg).'),
+  calcium: z.number().optional().describe('The estimated Calcium content of the meal, in milligrams (mg).'),
+  potassium: z.number().optional().describe('The estimated Potassium content of the meal, in milligrams (mg).'),
 });
 export type AnalyzeMealOutput = z.infer<typeof AnalyzeMealOutputSchema>;
 
@@ -42,7 +47,7 @@ const analyzeMealPrompt = ai.definePrompt({
 
 Meal Description: {{{mealDescription}}}
 
-Consider the ingredients and preparation methods to estimate the calories, protein, carbs, and fats.
+Consider the ingredients and preparation methods to estimate the calories, protein, carbs, fats, and key micronutrients.
 Also, list the ingredients that you recognize.
 
 Format your response as a JSON object with the following fields:
@@ -50,7 +55,12 @@ Format your response as a JSON object with the following fields:
 - protein: The estimated protein content of the meal, in grams.
 - carbs: The estimated carbohydrate content of the meal, in grams.
 - fats: The estimated fat content of the meal, in grams.
-- ingredients: A list of identified ingredients in the meal.`,
+- ingredients: A list of identified ingredients in the meal.
+- vitaminC: The estimated Vitamin C content of the meal, in milligrams (mg).
+- vitaminD: The estimated Vitamin D content of the meal, in micrograms (mcg).
+- iron: The estimated Iron content of the meal, in milligrams (mg).
+- calcium: The estimated Calcium content of the meal, in milligrams (mg).
+- potassium: The estimated Potassium content of the meal, in milligrams (mg).`,
 });
 
 const analyzeMealFlow = ai.defineFlow(

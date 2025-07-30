@@ -1,21 +1,15 @@
 "use client";
 
-import { Apple, Beef, Cookie, CookingPot } from "lucide-react";
+import { Apple, Beef, Bone, Cookie, CookingPot, Droplets, Leaf, ShieldCheck, Wind } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import type { Meal } from "@/lib/types";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 interface MealListProps {
   meals: Meal[];
 }
-
-const nutrientIcons = {
-  calories: CookingPot,
-  protein: Beef,
-  carbs: Apple,
-  fats: Cookie,
-};
 
 export function MealList({ meals }: MealListProps) {
   if (meals.length === 0) {
@@ -36,10 +30,10 @@ export function MealList({ meals }: MealListProps) {
       </CardHeader>
       <CardContent>
         <ScrollArea className="h-[340px] pr-4">
-          <div className="space-y-4">
+          <Accordion type="multiple" className="w-full space-y-4">
             {meals.map((meal) => (
-              <div key={meal.id} className="rounded-lg border bg-card p-4">
-                <div className="mb-2 flex items-start justify-between">
+              <AccordionItem key={meal.id} value={meal.id} className="rounded-lg border bg-card p-4">
+                 <div className="mb-2 flex items-start justify-between">
                     <div>
                         <p className="font-semibold">{meal.description}</p>
                         <p className="text-xs text-muted-foreground">
@@ -49,22 +43,34 @@ export function MealList({ meals }: MealListProps) {
                 </div>
 
                 <div className="mb-3 grid grid-cols-2 gap-2 text-sm sm:grid-cols-4">
-                  <div className="flex items-center gap-2"><nutrientIcons.calories className="h-4 w-4 text-red-500" /> Calories: {meal.calories.toFixed(0)}</div>
-                  <div className="flex items-center gap-2"><nutrientIcons.protein className="h-4 w-4 text-blue-500" /> Protein: {meal.protein.toFixed(0)}g</div>
-                  <div className="flex items-center gap-2"><nutrientIcons.carbs className="h-4 w-4 text-yellow-500" /> Carbs: {meal.carbs.toFixed(0)}g</div>
-                  <div className="flex items-center gap-2"><nutrientIcons.fats className="h-4 w-4 text-purple-500" /> Fats: {meal.fats.toFixed(0)}g</div>
+                  <div className="flex items-center gap-2"><CookingPot className="h-4 w-4 text-red-500" /> Calories: {meal.calories.toFixed(0)}</div>
+                  <div className="flex items-center gap-2"><Beef className="h-4 w-4 text-blue-500" /> Protein: {meal.protein.toFixed(0)}g</div>
+                  <div className="flex items-center gap-2"><Apple className="h-4 w-4 text-yellow-500" /> Carbs: {meal.carbs.toFixed(0)}g</div>
+                  <div className="flex items-center gap-2"><Cookie className="h-4 w-4 text-purple-500" /> Fats: {meal.fats.toFixed(0)}g</div>
                 </div>
+                
+                <AccordionTrigger className="text-xs text-muted-foreground hover:no-underline">Show More</AccordionTrigger>
+                
+                <AccordionContent>
+                  <div className="mt-3 grid grid-cols-2 gap-2 text-sm sm:grid-cols-3">
+                    <div className="flex items-center gap-2"><Bone className="h-4 w-4 text-gray-400" /> Calcium: {(meal.calcium || 0).toFixed(1)}mg</div>
+                    <div className="flex items-center gap-2"><Droplets className="h-4 w-4 text-red-700" /> Iron: {(meal.iron || 0).toFixed(1)}mg</div>
+                    <div className="flex items-center gap-2"><Wind className="h-4 w-4 text-green-500" /> Potassium: {(meal.potassium || 0).toFixed(1)}mg</div>
+                    <div className="flex items-center gap-2"><Leaf className="h-4 w-4 text-orange-500" /> Vitamin C: {(meal.vitaminC || 0).toFixed(1)}mg</div>
+                    <div className="flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-yellow-400" /> Vitamin D: {(meal.vitaminD || 0).toFixed(1)}mcg</div>
+                  </div>
 
-                <div className="flex flex-wrap gap-2">
-                  {meal.ingredients.map((ingredient) => (
-                    <Badge key={ingredient} variant="secondary">
-                      {ingredient}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {meal.ingredients.map((ingredient) => (
+                      <Badge key={ingredient} variant="secondary">
+                        {ingredient}
+                      </Badge>
+                    ))}
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
             ))}
-          </div>
+          </Accordion>
         </ScrollArea>
       </CardContent>
     </Card>
