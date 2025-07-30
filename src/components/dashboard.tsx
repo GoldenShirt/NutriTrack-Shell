@@ -162,18 +162,18 @@ export function Dashboard() {
         )}
       </div>
 
-      {isLoadingGoals ? (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <Skeleton className="h-[125px]" />
-            <Skeleton className="h-[125px]" />
-            <Skeleton className="h-[125px]" />
-            <Skeleton className="h-[125px]" />
-        </div>
-      ) : (
-        <DailySummary meals={mealsForSelectedDate} goals={dailyGoals} />
-      )}
-      <div className="grid gap-4">
-          <MealList meals={mealsForSelectedDate} date={currentDate} />
+      <div className="space-y-4">
+        {isLoadingGoals ? (
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+              <Skeleton className="h-[125px]" />
+              <Skeleton className="h-[125px]" />
+              <Skeleton className="h-[125px]" />
+              <Skeleton className="h-[125px]" />
+          </div>
+        ) : (
+          <DailySummary meals={mealsForSelectedDate} goals={dailyGoals} />
+        )}
+        <MealList meals={mealsForSelectedDate} date={currentDate} />
       </div>
     </div>
   );
