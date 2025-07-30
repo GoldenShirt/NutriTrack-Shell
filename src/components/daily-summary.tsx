@@ -37,9 +37,9 @@ export function DailySummary({ meals, goals }: DailySummaryProps) {
     const isRightSwipe = distance < -minSwipeDistance;
 
     if (isLeftSwipe) {
-      setView(view === 'macros' ? 'micros' : 'macros');
+      setView('micros');
     } else if (isRightSwipe) {
-      setView(view === 'micros' ? 'macros' : 'micros');
+      setView('macros');
     }
 
     setTouchStartX(null);
@@ -81,10 +81,10 @@ export function DailySummary({ meals, goals }: DailySummaryProps) {
   ];
   
   const toggleView = (direction: 'next' | 'prev') => {
-    if (direction === 'next') {
-        setView(v => v === 'macros' ? 'micros' : 'macros');
-    } else {
-        setView(v => v === 'micros' ? 'macros' : 'macros');
+    if (direction === 'next' && view === 'macros') {
+        setView('micros');
+    } else if (direction === 'prev' && view === 'micros') {
+        setView('macros');
     }
   }
 
@@ -142,9 +142,11 @@ export function DailySummary({ meals, goals }: DailySummaryProps) {
         variant="outline" 
         size="icon" 
         onClick={() => toggleView('prev')} 
+        disabled={view === 'macros'}
         className={cn(
             "absolute -left-3 top-1/2 -translate-y-1/2 z-10 transition-opacity opacity-100",
-             "sm:opacity-0 sm:group-hover:opacity-100 flex"
+             "sm:opacity-0 sm:group-hover:opacity-100 flex",
+             {"disabled:opacity-25 disabled:cursor-not-allowed": view === 'macros'}
         )}
       >
         <ArrowLeft className="h-4 w-4" />
@@ -153,9 +155,11 @@ export function DailySummary({ meals, goals }: DailySummaryProps) {
         variant="outline" 
         size="icon" 
         onClick={() => toggleView('next')} 
+        disabled={view === 'micros'}
         className={cn(
             "absolute -right-3 top-1/2 -translate-y-1/2 z-10 transition-opacity opacity-100",
-            "sm:opacity-0 sm:group-hover:opacity-100 flex"
+            "sm:opacity-0 sm:group-hover:opacity-100 flex",
+            {"disabled:opacity-25 disabled:cursor-not-allowed": view === 'micros'}
         )}
       >
           <ArrowRight className="h-4 w-4" />
