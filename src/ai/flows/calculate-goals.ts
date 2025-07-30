@@ -58,25 +58,33 @@ export async function calculateGoals(input: CalculateGoalsInput): Promise<Calcul
 
     // 3. Adjust TDEE for calorie goal based on a priority of goals
     let calorieGoal = tdee;
-    if (healthGoals.includes('Lose Weight')) {
-        calorieGoal -= 500; // Prioritize weight loss calorie deficit
-    } else if (healthGoals.includes('Gain Muscle')) {
-        calorieGoal += 300; // More conservative surplus for lean muscle gain
-    } else if (healthGoals.includes('Maintain Weight')) {
-        calorieGoal = tdee; // Explicitly maintain
-    }
     
-    // 4. Determine macronutrient split based on goal combinations
+    // 4. Determine macronutrient split and adjust calories based on goal combinations
+    // The order of these checks is important to handle combined goals correctly.
     let macroSplit = { carbs: 0.45, protein: 0.25, fats: 0.30 }; // Default/Maintain/Eat Healthier
 
-    if (healthGoals.includes('Lose Weight')) {
-        macroSplit = { carbs: 0.35, protein: 0.40, fats: 0.25 }; // High protein to preserve muscle
-    } else if (healthGoals.includes('Gain Muscle') && healthGoals.includes('Improve Endurance')) {
+    const hasLoseWeight = healthGoals.includes('Lose Weight');
+    const hasGainMuscle = healthGoals.includes('Gain Muscle');
+    const hasImproveEndurance = healthGoals.includes('Improve Endurance');
+
+    if (hasLoseWeight && hasGainMuscle) { // Body Recomposition
+        calorieGoal = tdee - 250; // Slight deficit
+        macroSplit = { carbs: 0.35, protein: 0.40, fats: 0.25 }; // High protein
+    } else if (hasGainMuscle && hasImproveEndurance) { // Athletic build
+        calorieGoal = tdee + 250; // Slight surplus
         macroSplit = { carbs: 0.50, protein: 0.30, fats: 0.20 }; // Higher carbs for dual goals
-    } else if (healthGoals.includes('Gain Muscle')) {
+    } else if (hasLoseWeight) { // Prioritize Weight Loss
+        calorieGoal = tdee - 500; // Standard deficit
+        macroSplit = { carbs: 0.35, protein: 0.40, fats: 0.25 }; // High protein to preserve muscle
+    } else if (hasGainMuscle) { // Prioritize Muscle Gain
+        calorieGoal = tdee + 300; // More conservative surplus for lean gain
         macroSplit = { carbs: 0.45, protein: 0.35, fats: 0.20 }; // High protein and moderate carbs
-    } else if (healthGoals.includes('Improve Endurance')) {
+    } else if (hasImproveEndurance) { // Prioritize Endurance
+        calorieGoal = tdee; // Often done at maintenance
         macroSplit = { carbs: 0.55, protein: 0.25, fats: 0.20 }; // High carbs for fuel
+    } else if (healthGoals.includes('Maintain Weight')) {
+        calorieGoal = tdee; // Explicitly maintain
+        macroSplit = { carbs: 0.45, protein: 0.25, fats: 0.30 };
     }
 
     // 5. Calculate grams for each macronutrient
