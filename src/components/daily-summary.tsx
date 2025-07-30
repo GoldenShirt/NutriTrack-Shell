@@ -108,7 +108,8 @@ export function DailySummary({ meals, goals }: DailySummaryProps) {
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-5 gap-4 p-1 animate-fade-in">
       {microStats.map((stat, index) => (
          <div key={stat.title} className={cn("w-full", {
-             "sm:col-start-2 md:col-start-2": index === 3 && microStats.length === 5,
+             "sm:col-start-2 md:col-start-2 lg:col-start-auto": index === 3 && microStats.length === 5,
+             "lg:col-start-2": index === 4 && microStats.length === 5,
          })}>
           <Card className="shadow-sm w-full h-full">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -140,7 +141,7 @@ export function DailySummary({ meals, goals }: DailySummaryProps) {
         className={cn(
             "absolute -left-3 top-1/2 -translate-y-1/2 z-10 transition-opacity",
              view === 'macros' ? "opacity-0 pointer-events-none" : "opacity-100",
-             "sm:opacity-0 sm:group-hover:opacity-100" // Show on hover on larger screens
+             "sm:opacity-0 sm:group-hover:opacity-100 sm:flex"
         )}
       >
         <ChevronLeft className="h-4 w-4" />
@@ -152,7 +153,7 @@ export function DailySummary({ meals, goals }: DailySummaryProps) {
         className={cn(
             "absolute -right-3 top-1/2 -translate-y-1/2 z-10 transition-opacity",
             view === 'micros' ? "opacity-0 pointer-events-none" : "opacity-100",
-            "sm:opacity-0 sm:group-hover:opacity-100" // Show on hover on larger screens
+            "sm:opacity-0 sm:group-hover:opacity-100 sm:flex"
         )}
       >
           <ChevronRight className="h-4 w-4" />
@@ -160,4 +161,3 @@ export function DailySummary({ meals, goals }: DailySummaryProps) {
     </div>
   );
 }
-
