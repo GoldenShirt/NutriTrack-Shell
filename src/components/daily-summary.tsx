@@ -1,14 +1,13 @@
 
 "use client";
 
-import { Apple, Beef, Cookie, CookingPot, Leaf, Droplets, Wind, ShieldCheck, Bone } from "lucide-react";
+import { Apple, Beef, Bone, Cookie, CookingPot, Droplets, Leaf, ShieldCheck, Wind, ChevronLeft, ChevronRight } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import type { DailyGoals, Meal } from "@/lib/types";
-import { useMemo, useRef } from "react";
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "./ui/carousel";
-import AutoHeight from "embla-carousel-auto-height";
-
+import { useMemo, useState, TouchEvent } from "react";
+import { Button } from "./ui/button";
+import { cn } from "@/lib/utils";
 
 interface DailySummaryProps {
   meals: Meal[];
@@ -16,8 +15,38 @@ interface DailySummaryProps {
 }
 
 export function DailySummary({ meals, goals }: DailySummaryProps) {
-  const autoHeight = useRef(AutoHeight());
-  
+  const [view, setView] = useState<'macros' | 'micros'>('macros');
+  const [touchStartX, setTouchStartX] = useState<number | null>(null);
+  const [touchEndX, setTouchEndX] = useState<number | null>(null);
+
+  const minSwipeDistance = 50;
+
+  const handleTouchStart = (e: TouchEvent) => {
+    setTouchEndX(null); // otherwise the swipe is fired even with usual touch events
+    setTouchStartX(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchMove = (e: TouchEvent) => {
+    setTouchEndX(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStartX || !touchEndX) return;
+    const distance = touchStartX - touchEndX;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    if (isLeftSwipe) {
+      setView('micros');
+    } else if (isRightSwipe) {
+      setView('macros');
+    }
+
+    setTouchStartX(null);
+    setTouchEndX(null);
+  };
+
+
   const summary = useMemo(() => {
     return meals.reduce(
       (acc, meal) => {
@@ -50,53 +79,72 @@ export function DailySummary({ meals, goals }: DailySummaryProps) {
     { title: "Vitamin C", value: summary.vitaminC, goal: goals.vitaminC, unit: "mg", icon: Leaf, color: "text-orange-500" },
     { title: "Vitamin D", value: summary.vitaminD, goal: goals.vitaminD, unit: "mcg", icon: ShieldCheck, color: "text-yellow-400" },
   ];
+  
+  const toggleView = () => {
+    setView(prev => prev === 'macros' ? 'micros' : 'macros');
+  }
 
   return (
-    <div className="w-full">
-        <Carousel plugins={[autoHeight.current]} className="w-full">
-            <CarouselContent>
-                <CarouselItem>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-1">
-                        {macroStats.map((stat) => (
-                            <Card key={stat.title} className="shadow-sm">
-                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
-                                <stat.icon className={`h-4 w-4 text-muted-foreground ${stat.color}`} />
-                            </CardHeader>
-                            <CardContent>
-                                <div className="text-2xl font-bold">
-                                {stat.value.toFixed(0)}
-                                <span className="text-xs text-muted-foreground">/{stat.goal}{stat.unit}</span>
-                                </div>
-                                <Progress value={(stat.goal > 0 ? (stat.value / stat.goal) * 100 : 0)} className="mt-2 h-2" />
-                            </CardContent>
-                            </Card>
-                        ))}
-                    </div>
-                </CarouselItem>
-                <CarouselItem>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 p-1">
-                        {microStats.map((stat) => (
-                            <Card key={stat.title} className="shadow-sm">
-                                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
-                                <stat.icon className={`h-4 w-4 text-muted-foreground ${stat.color}`} />
-                                </CardHeader>
-                                <CardContent>
-                                <div className="text-2xl font-bold">
-                                    {stat.value.toFixed(1)}
-                                    <span className="text-xs text-muted-foreground">/{stat.goal}{stat.unit}</span>
-                                </div>
-                                <Progress value={stat.goal > 0 ? (stat.value / stat.goal) * 100 : 0} className="mt-2 h-2" />
-                                </CardContent>
-                            </Card>
-                        ))}
-                    </div>
-                </CarouselItem>
-            </CarouselContent>
-            <CarouselPrevious />
-            <CarouselNext />
-        </Carousel>
+    <div className="w-full relative group" onTouchStart={handleTouchStart} onTouchMove={handleTouchMove} onTouchEnd={handleTouchEnd}>
+        
+        <Button 
+          variant="outline" 
+          size="icon" 
+          onClick={() => setView('macros')} 
+          className={cn("absolute -left-3 top-1/2 -translate-y-1/2 z-10 opacity-0 group-hover:opacity-100 transition-opacity", { 'hidden': view === 'macros' })}
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </Button>
+
+        {view === 'macros' && (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-1">
+                {macroStats.map((stat) => (
+                    <Card key={stat.title} className="shadow-sm">
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
+                        <stat.icon className={`h-4 w-4 text-muted-foreground ${stat.color}`} />
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-2xl font-bold">
+                        {stat.value.toFixed(0)}
+                        <span className="text-xs text-muted-foreground">/{stat.goal}{stat.unit}</span>
+                        </div>
+                        <Progress value={(stat.goal > 0 ? (stat.value / stat.goal) * 100 : 0)} className="mt-2 h-2" />
+                    </CardContent>
+                    </Card>
+                ))}
+            </div>
+        )}
+        
+        {view === 'micros' && (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-5 gap-4 p-1">
+                {microStats.map((stat) => (
+                    <Card key={stat.title} className="shadow-sm">
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
+                        <stat.icon className={`h-4 w-4 text-muted-foreground ${stat.color}`} />
+                        </CardHeader>
+                        <CardContent>
+                        <div className="text-2xl font-bold">
+                            {stat.value.toFixed(1)}
+                            <span className="text-xs text-muted-foreground">/{stat.goal}{stat.unit}</span>
+                        </div>
+                        <Progress value={stat.goal > 0 ? (stat.value / stat.goal) * 100 : 0} className="mt-2 h-2" />
+                        </CardContent>
+                    </Card>
+                ))}
+            </div>
+        )}
+
+        <Button 
+          variant="outline" 
+          size="icon" 
+          onClick={() => setView('micros')} 
+          className={cn("absolute -right-3 top-1/2 -translate-y-1/2 z-10 opacity-0 group-hover:opacity-100 transition-opacity", { 'hidden': view === 'micros' })}
+        >
+            <ChevronRight className="h-4 w-4" />
+        </Button>
     </div>
   );
 }
+
