@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
@@ -39,8 +40,10 @@ export function useUserStore() {
     const updatedPrefs = {...newPreferences};
     setPreferences(updatedPrefs);
     try {
-        const userData = { preferences: updatedPrefs };
-        localStorage.setItem(STORE_KEY, JSON.stringify(userData));
+        if (typeof window !== "undefined") {
+            const userData = { preferences: updatedPrefs };
+            localStorage.setItem(STORE_KEY, JSON.stringify(userData));
+        }
       } catch (error) {
         console.error("Failed to save user data to localStorage", error);
       }

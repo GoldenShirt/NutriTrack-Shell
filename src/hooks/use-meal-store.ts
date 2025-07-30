@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
@@ -16,7 +17,9 @@ const setMeals = (newMeals: Meal[] | ((prev: Meal[]) => Meal[])) => {
   }
   
   try {
-    localStorage.setItem(STORE_KEY, JSON.stringify(meals));
+    if (typeof window !== "undefined") {
+      localStorage.setItem(STORE_KEY, JSON.stringify(meals));
+    }
   } catch (error) {
     console.error("Failed to save meals to localStorage", error);
   }
@@ -27,22 +30,22 @@ const setMeals = (newMeals: Meal[] | ((prev: Meal[]) => Meal[])) => {
 };
 
 
-try {
-  const storedMeals = localStorage.getItem(STORE_KEY);
-  if (storedMeals) {
-    meals = JSON.parse(storedMeals);
-  }
-} catch (error) {
-  console.error("Failed to load meals from localStorage", error);
-}
-
 export function useMealStore() {
   const [localMeals, setLocalMeals] = useState(meals);
   const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
-    // The store is initialized synchronously above, but we use this to signal readiness
-    setIsInitialized(true);
+    try {
+      const storedMeals = localStorage.getItem(STORE_KEY);
+      if (storedMeals) {
+        meals = JSON.parse(storedMeals);
+        setLocalMeals(meals);
+      }
+    } catch (error) {
+      console.error("Failed to load meals from localStorage", error);
+    } finally {
+      setIsInitialized(true);
+    }
     
     listeners.push(setLocalMeals);
     return () => {
