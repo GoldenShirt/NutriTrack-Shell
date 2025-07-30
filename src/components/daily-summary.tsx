@@ -22,7 +22,7 @@ export function DailySummary({ meals, goals }: DailySummaryProps) {
   const minSwipeDistance = 50;
 
   const handleTouchStart = (e: TouchEvent) => {
-    setTouchEndX(null); // otherwise the swipe is fired even with usual touch events
+    setTouchEndX(null); 
     setTouchStartX(e.targetTouches[0].clientX);
   };
 
@@ -80,8 +80,8 @@ export function DailySummary({ meals, goals }: DailySummaryProps) {
     { title: "Vitamin D", value: summary.vitaminD, goal: goals.vitaminD, unit: "mcg", icon: ShieldCheck, color: "text-yellow-400" },
   ];
   
-  const toggleView = () => {
-    setView(prev => prev === 'macros' ? 'micros' : 'macros');
+  const toggleView = (v: 'macros' | 'micros') => {
+    setView(v);
   }
 
   return (
@@ -90,8 +90,8 @@ export function DailySummary({ meals, goals }: DailySummaryProps) {
         <Button 
           variant="outline" 
           size="icon" 
-          onClick={() => setView('macros')} 
-          className={cn("absolute -left-3 top-1/2 -translate-y-1/2 z-10 opacity-0 group-hover:opacity-100 transition-opacity", { 'hidden': view === 'macros' })}
+          onClick={() => toggleView('macros')} 
+          className={cn("absolute -left-3 top-1/2 -translate-y-1/2 z-10 md:opacity-0 group-hover:opacity-100 transition-opacity", { 'hidden': view === 'macros' })}
         >
           <ChevronLeft className="h-4 w-4" />
         </Button>
@@ -139,13 +139,12 @@ export function DailySummary({ meals, goals }: DailySummaryProps) {
         <Button 
           variant="outline" 
           size="icon" 
-          onClick={() => setView('micros')} 
-          className={cn("absolute -right-3 top-1/2 -translate-y-1/2 z-10 opacity-0 group-hover:opacity-100 transition-opacity", { 'hidden': view === 'micros' })}
+          onClick={() => toggleView('micros')} 
+          className={cn("absolute -right-3 top-1/2 -translate-y-1/2 z-10 md:opacity-0 group-hover:opacity-100 transition-opacity", { 'hidden': view === 'micros' })}
         >
             <ChevronRight className="h-4 w-4" />
         </Button>
     </div>
   );
 }
-
 
