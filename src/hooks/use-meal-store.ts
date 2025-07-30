@@ -1,4 +1,3 @@
-
 "use client";
 
 import { create } from 'zustand';
@@ -10,7 +9,8 @@ const STORE_KEY = "nutritrack-meals";
 interface MealStoreState {
   meals: Meal[];
   addMeal: (meal: Meal) => void;
-  isInitialized: () => boolean;
+  updateMeal: (mealId: string, updates: Partial<Meal>) => void;
+  getMeals: () => Meal[];
 }
 
 export const useMealStore = create<MealStoreState>()(
@@ -21,7 +21,13 @@ export const useMealStore = create<MealStoreState>()(
         set((state) => ({
           meals: [...state.meals, meal].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
         })),
-      isInitialized: () => get().meals.length > 0 || localStorage.getItem(STORE_KEY) !== null,
+      updateMeal: (mealId: string, updates: Partial<Meal>) =>
+        set((state) => ({
+          meals: state.meals.map((meal) =>
+            meal.id === mealId ? { ...meal, ...updates } : meal
+          ),
+        })),
+      getMeals: () => get().meals,
     }),
     {
       name: STORE_KEY,

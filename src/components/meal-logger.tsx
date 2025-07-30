@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import type { Meal } from "@/lib/types";
 import { analyzeMealAction } from "@/app/actions";
 import { CardDescription } from "@/components/ui/card";
+import { useMealStore } from "@/hooks/use-meal-store";
 
 interface MealLoggerProps {
   onMealAdded: (meal: Meal) => void;
@@ -26,8 +27,9 @@ type MealLoggerValues = z.infer<typeof MealLoggerSchema>;
 
 export function MealLogger({ onMealAdded }: MealLoggerProps) {
   const { toast } = useToast();
+  const { addMeal, updateMeal } = useMealStore();
   const [isRecording, setIsRecording] = useState(false);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const recognitionRef = useRef<SpeechRecognition | null>(null);
 
   const form = useForm<MealLoggerValues>({
@@ -80,30 +82,47 @@ export function MealLogger({ onMealAdded }: MealLoggerProps) {
   };
 
   const onSubmit = async (data: MealLoggerValues) => {
-    setIsAnalyzing(true);
+    setIsSubmitting(true);
+    
+    const tempId = new Date().toISOString() + Math.random();
+    const optimisticMeal: Meal = {
+      id: tempId,
+      date: new Date().toISOString(),
+      description: data.description,
+      status: 'pending',
+      calories: 0,
+      protein: 0,
+      carbs: 0,
+      fats: 0,
+      ingredients: [],
+    };
+
+    addMeal(optimisticMeal);
+    onMealAdded(optimisticMeal);
+    form.reset();
+    
     try {
       const analysis = await analyzeMealAction({ mealDescription: data.description });
-      const newMeal: Meal = {
+      const finalMeal: Partial<Meal> & { status: 'complete' } = {
         ...analysis,
-        id: new Date().toISOString() + Math.random(),
-        date: new Date().toISOString(),
-        description: data.description,
+        status: 'complete',
       };
-      onMealAdded(newMeal);
-      form.reset();
+      updateMeal(tempId, finalMeal);
+      
       toast({
         title: "Meal Logged!",
         description: "Your meal has been analyzed and added to your daily log.",
       });
     } catch (error) {
       console.error("Failed to analyze meal", error);
+      updateMeal(tempId, { status: 'complete' }); // or a new 'failed' status
       toast({
         variant: "destructive",
         title: "Analysis Failed",
         description: "The AI could not analyze your meal. Please try again.",
       });
     } finally {
-      setIsAnalyzing(false);
+      setIsSubmitting(false);
     }
   };
 
@@ -135,13 +154,13 @@ export function MealLogger({ onMealAdded }: MealLoggerProps) {
                 variant={isRecording ? "destructive" : "outline"}
                 size="icon"
                 onClick={handleVoiceInput}
-                disabled={isAnalyzing}
+                disabled={isSubmitting}
               >
                 <Mic className="h-4 w-4" />
                 <span className="sr-only">Use Voice</span>
               </Button>
-              <Button type="submit" className="w-full" disabled={isAnalyzing}>
-                {isAnalyzing ? (
+              <Button type="submit" className="w-full" disabled={isSubmitting}>
+                {isSubmitting ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 ) : (
                   <Wand2 className="mr-2 h-4 w-4" />

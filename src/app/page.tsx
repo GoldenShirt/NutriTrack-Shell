@@ -9,13 +9,13 @@ import { Icons } from "@/components/icons";
 import { Dashboard } from "@/components/dashboard";
 import { MealLogger } from "@/components/meal-logger";
 import { useMealStore } from "@/hooks/use-meal-store";
+import { Meal } from "@/lib/types";
 
 export default function Home() {
   const [isLogMealOpen, setIsLogMealOpen] = useState(false);
-  const { addMeal } = useMealStore();
 
-  const handleMealAdded = (meal: any) => {
-    addMeal(meal);
+  const handleMealAdded = (meal: Meal) => {
+    // The meal is already added to the store optimistically in MealLogger
     setIsLogMealOpen(false);
   };
 

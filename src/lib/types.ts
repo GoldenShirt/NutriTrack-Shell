@@ -5,6 +5,7 @@ export interface Meal extends AnalyzeMealOutput {
   id: string;
   date: string; // ISO string
   description: string;
+  status: 'pending' | 'complete';
 }
 
 export interface ChatMessage {
