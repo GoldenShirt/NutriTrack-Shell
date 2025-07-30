@@ -10,6 +10,7 @@ interface MealStoreState {
   meals: Meal[];
   addMeal: (meal: Meal) => void;
   updateMeal: (mealId: string, updates: Partial<Meal>) => void;
+  deleteMeal: (mealId: string) => void;
   getMeals: () => Meal[];
 }
 
@@ -26,6 +27,10 @@ export const useMealStore = create<MealStoreState>()(
           meals: state.meals.map((meal) =>
             meal.id === mealId ? { ...meal, ...updates } : meal
           ),
+        })),
+      deleteMeal: (mealId: string) =>
+        set((state) => ({
+            meals: state.meals.filter((meal) => meal.id !== mealId),
         })),
       getMeals: () => get().meals,
     }),

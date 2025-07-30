@@ -1,7 +1,7 @@
 
 "use client";
 
-import { Apple, Beef, Bone, Cookie, CookingPot, Droplets, Leaf, Loader2, ShieldCheck, Wind } from "lucide-react";
+import { Apple, Beef, Bone, Cookie, CookingPot, Droplets, Leaf, Loader2, ShieldCheck, Trash2, Wind } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -9,6 +9,19 @@ import type { Meal } from "@/lib/types";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { format, isToday } from "date-fns";
 import { cn } from "@/lib/utils";
+import { useMealStore } from "@/hooks/use-meal-store";
+import { Button } from "./ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 
 interface MealListProps {
   meals: Meal[];
@@ -17,6 +30,7 @@ interface MealListProps {
 
 export function MealList({ meals, date }: MealListProps) {
   const dateLabel = isToday(date) ? "Today's Meals" : "Meals for " + format(date, "MMMM d");
+  const { deleteMeal } = useMealStore();
   
   if (meals.length === 0) {
     return (
@@ -38,7 +52,26 @@ export function MealList({ meals, date }: MealListProps) {
         <ScrollArea className="h-auto max-h-[400px] pr-4">
           <Accordion type="multiple" className="w-full space-y-4">
             {meals.map((meal) => (
-              <AccordionItem key={meal.id} value={meal.id} className={cn("rounded-lg border bg-card p-4", meal.status === 'pending' && "opacity-60")}>
+              <AccordionItem key={meal.id} value={meal.id} className={cn("relative rounded-lg border bg-card p-4 pr-10", meal.status === 'pending' && "opacity-60")}>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="ghost" size="icon" className="absolute top-2 right-1 h-7 w-7">
+                        <Trash2 className="h-4 w-4 text-muted-foreground hover:text-destructive" />
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This action cannot be undone. This will permanently delete this meal from your log.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction onClick={() => deleteMeal(meal.id)}>Delete</AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
                  <div className="mb-2 flex items-start justify-between">
                     <div>
                         <p className="font-semibold">{meal.description}</p>
