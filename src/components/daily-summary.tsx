@@ -108,8 +108,7 @@ export function DailySummary({ meals, goals }: DailySummaryProps) {
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-5 gap-4 p-1">
       {microStats.map((stat, index) => (
          <div key={stat.title} className={cn("w-full", {
-             "sm:col-start-2 md:col-start-2 lg:col-start-auto": index === 3 && microStats.length === 5,
-             "lg:col-start-2": index === 4 && microStats.length === 5,
+            "col-span-2 sm:col-span-1 sm:col-start-2 md:col-start-2 lg:col-start-auto": index === 2 && microStats.length === 5
          })}>
           <Card className="shadow-sm w-full h-full">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -141,8 +140,8 @@ export function DailySummary({ meals, goals }: DailySummaryProps) {
         onClick={() => toggleView('macros')} 
         className={cn(
             "absolute -left-3 top-1/2 -translate-y-1/2 z-10 transition-opacity",
-             view === 'macros' ? "opacity-0 pointer-events-none" : "opacity-100",
-             "hidden sm:group-hover:flex"
+             view === 'macros' ? "opacity-0 pointer-events-none" : "opacity-100 sm:opacity-0",
+             "sm:group-hover:opacity-100 flex"
         )}
       >
         <ChevronLeft className="h-4 w-4" />
@@ -153,8 +152,8 @@ export function DailySummary({ meals, goals }: DailySummaryProps) {
         onClick={() => toggleView('micros')} 
         className={cn(
             "absolute -right-3 top-1/2 -translate-y-1/2 z-10 transition-opacity",
-            view === 'micros' ? "opacity-0 pointer-events-none" : "opacity-100",
-            "hidden sm:group-hover:flex"
+            view === 'micros' ? "opacity-0 pointer-events-none" : "opacity-100 sm:opacity-0",
+            "sm:group-hover:opacity-100 flex"
         )}
       >
           <ChevronRight className="h-4 w-4" />
