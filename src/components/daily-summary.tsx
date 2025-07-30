@@ -1,7 +1,7 @@
 
 "use client";
 
-import { Apple, Beef, Bone, Cookie, CookingPot, Droplets, Leaf, ShieldCheck, Wind, ChevronLeft, ChevronRight } from "lucide-react";
+import { Apple, Beef, Bone, Cookie, CookingPot, Droplets, Leaf, ShieldCheck, Wind, ArrowLeft, ArrowRight } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import type { DailyGoals, Meal } from "@/lib/types";
@@ -36,10 +36,10 @@ export function DailySummary({ meals, goals }: DailySummaryProps) {
     const isLeftSwipe = distance > minSwipeDistance;
     const isRightSwipe = distance < -minSwipeDistance;
 
-    if (isLeftSwipe && view === 'macros') {
-      setView('micros');
-    } else if (isRightSwipe && view === 'micros') {
-      setView('macros');
+    if (isLeftSwipe) {
+      setView(view === 'macros' ? 'micros' : 'macros');
+    } else if (isRightSwipe) {
+      setView(view === 'micros' ? 'macros' : 'micros');
     }
 
     setTouchStartX(null);
@@ -80,8 +80,12 @@ export function DailySummary({ meals, goals }: DailySummaryProps) {
     { title: "Vitamin D", value: summary.vitaminD, goal: goals.vitaminD, unit: "mcg", icon: ShieldCheck, color: "text-yellow-400" },
   ];
   
-  const toggleView = (v: 'macros' | 'micros') => {
-    setView(v);
+  const toggleView = (direction: 'next' | 'prev') => {
+    if (direction === 'next') {
+        setView(v => v === 'macros' ? 'micros' : 'macros');
+    } else {
+        setView(v => v === 'micros' ? 'macros' : 'macros');
+    }
   }
 
   const renderMacros = () => (
@@ -137,26 +141,24 @@ export function DailySummary({ meals, goals }: DailySummaryProps) {
       <Button 
         variant="outline" 
         size="icon" 
-        onClick={() => toggleView('macros')} 
+        onClick={() => toggleView('prev')} 
         className={cn(
-            "absolute -left-3 top-1/2 -translate-y-1/2 z-10 transition-opacity",
-             view === 'macros' ? "opacity-0 pointer-events-none" : "opacity-100 sm:opacity-0",
-             "sm:group-hover:opacity-100 flex"
+            "absolute -left-3 top-1/2 -translate-y-1/2 z-10 transition-opacity opacity-100",
+             "sm:opacity-0 sm:group-hover:opacity-100 flex"
         )}
       >
-        <ChevronLeft className="h-4 w-4" />
+        <ArrowLeft className="h-4 w-4" />
       </Button>
       <Button 
         variant="outline" 
         size="icon" 
-        onClick={() => toggleView('micros')} 
+        onClick={() => toggleView('next')} 
         className={cn(
-            "absolute -right-3 top-1/2 -translate-y-1/2 z-10 transition-opacity",
-            view === 'micros' ? "opacity-0 pointer-events-none" : "opacity-100 sm:opacity-0",
-            "sm:group-hover:opacity-100 flex"
+            "absolute -right-3 top-1/2 -translate-y-1/2 z-10 transition-opacity opacity-100",
+            "sm:opacity-0 sm:group-hover:opacity-100 flex"
         )}
       >
-          <ChevronRight className="h-4 w-4" />
+          <ArrowRight className="h-4 w-4" />
       </Button>
     </div>
   );
