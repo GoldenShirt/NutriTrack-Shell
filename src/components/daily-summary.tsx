@@ -1,12 +1,11 @@
 
 "use client";
 
-import { Apple, Beef, Cookie, CookingPot, Leaf, Droplets, Wind, ShieldCheck, Bone, ArrowLeftRight } from "lucide-react";
+import { Apple, Beef, Cookie, CookingPot, Leaf, Droplets, Wind, ShieldCheck, Bone } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import type { DailyGoals, Meal } from "@/lib/types";
-import { useMemo, useState, useRef } from "react";
-import { Button } from "./ui/button";
+import { useMemo, useRef } from "react";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "./ui/carousel";
 import AutoHeight from "embla-carousel-auto-height";
 
@@ -57,7 +56,7 @@ export function DailySummary({ meals, goals }: DailySummaryProps) {
         <Carousel plugins={[autoHeight.current]} className="w-full">
             <CarouselContent>
                 <CarouselItem>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-2 gap-4">
                         {macroStats.map((stat) => (
                             <Card key={stat.title} className="shadow-sm">
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
