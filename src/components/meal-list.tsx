@@ -48,7 +48,7 @@ export function MealList({ meals, date }: MealListProps) {
       <CardHeader>
         <CardTitle className="font-headline">{dateLabel}</CardTitle>
       </CardHeader>
-      <CardContent className="p-0.5">
+      <CardContent className="p-2">
         <ScrollArea className="h-auto max-h-[400px]">
           <Accordion type="multiple" className="w-full space-y-1">
             {meals.map((meal) => (
