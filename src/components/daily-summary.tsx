@@ -33,13 +33,11 @@ export function DailySummary({ meals, goals }: DailySummaryProps) {
     setTouchEndX(e.targetTouches[0].clientX);
   };
   
-  const toggleView = () => {
+  const toggleView = (e?: MouseEvent<HTMLButtonElement>) => {
     setView(v => v === 'macros' ? 'micros' : 'macros');
-  }
-  
-  const handleToggleClick = (e: MouseEvent<HTMLButtonElement>) => {
-    toggleView();
-    e.currentTarget.blur();
+    if (e) {
+      e.currentTarget.blur();
+    }
   }
 
   const handleTouchEnd = () => {
@@ -145,10 +143,9 @@ export function DailySummary({ meals, goals }: DailySummaryProps) {
       <Button 
         variant="outline" 
         size="icon" 
-        onClick={handleToggleClick}
-        onTouchCancel={(e) => (e.target as HTMLElement).blur()}
+        onClick={toggleView}
         className={cn(
-            "absolute -left-3 top-1/2 -translate-y-1/2 z-10 transition-opacity opacity-100 sm:opacity-0 group-hover:opacity-100"
+            "absolute -left-3 top-1/2 -translate-y-1/2 z-10 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity"
         )}
       >
         <ArrowLeft className="h-4 w-4" />
@@ -156,10 +153,9 @@ export function DailySummary({ meals, goals }: DailySummaryProps) {
       <Button 
         variant="outline" 
         size="icon" 
-        onClick={handleToggleClick} 
-        onTouchCancel={(e) => (e.target as HTMLElement).blur()}
+        onClick={toggleView} 
         className={cn(
-            "absolute -right-3 top-1/2 -translate-y-1/2 z-10 transition-opacity opacity-100 sm:opacity-0 group-hover:opacity-100"
+            "absolute -right-3 top-1/2 -translate-y-1/2 z-10 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity"
         )}
       >
           <ArrowRight className="h-4 w-4" />
