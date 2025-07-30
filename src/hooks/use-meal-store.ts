@@ -6,52 +6,32 @@ import type { Meal } from "@/lib/types";
 
 const STORE_KEY = "nutritrack-meals";
 
-let meals: Meal[] = [];
-let listeners: React.Dispatch<React.SetStateAction<Meal[]>>[] = [];
-
-const setMeals = (newMeals: Meal[] | ((prev: Meal[]) => Meal[])) => {
-  if (typeof newMeals === 'function') {
-    meals = newMeals(meals);
-  } else {
-    meals = newMeals;
-  }
-  
-  try {
-    if (typeof window !== "undefined") {
-      localStorage.setItem(STORE_KEY, JSON.stringify(meals));
-    }
-  } catch (error) {
-    console.error("Failed to save meals to localStorage", error);
-  }
-
-  listeners.forEach((listener) => {
-    listener(meals);
-  });
-};
-
-
 export function useMealStore() {
-  const [localMeals, setLocalMeals] = useState(meals);
+  const [meals, setMeals] = useState<Meal[]>([]);
   const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
     try {
       const storedMeals = localStorage.getItem(STORE_KEY);
       if (storedMeals) {
-        meals = JSON.parse(storedMeals);
-        setLocalMeals(meals);
+        setMeals(JSON.parse(storedMeals));
       }
     } catch (error) {
       console.error("Failed to load meals from localStorage", error);
     } finally {
       setIsInitialized(true);
     }
-    
-    listeners.push(setLocalMeals);
-    return () => {
-      listeners = listeners.filter(l => l !== setLocalMeals);
-    };
   }, []);
+
+  useEffect(() => {
+    if (isInitialized) {
+        try {
+            localStorage.setItem(STORE_KEY, JSON.stringify(meals));
+        } catch (error) {
+            console.error("Failed to save meals to localStorage", error);
+        }
+    }
+  }, [meals, isInitialized]);
 
 
   const addMeal = useCallback((meal: Meal) => {
@@ -60,5 +40,5 @@ export function useMealStore() {
     );
   }, []);
 
-  return { meals: localMeals, addMeal, isInitialized };
+  return { meals, addMeal, isInitialized };
 }
