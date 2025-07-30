@@ -56,7 +56,7 @@ export function DailySummary({ meals, goals }: DailySummaryProps) {
         <Carousel plugins={[autoHeight.current]} className="w-full">
             <CarouselContent>
                 <CarouselItem>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-1">
                         {macroStats.map((stat) => (
                             <Card key={stat.title} className="shadow-sm">
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -75,7 +75,7 @@ export function DailySummary({ meals, goals }: DailySummaryProps) {
                     </div>
                 </CarouselItem>
                 <CarouselItem>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 p-1">
                         {microStats.map((stat) => (
                             <Card key={stat.title} className="shadow-sm">
                                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
