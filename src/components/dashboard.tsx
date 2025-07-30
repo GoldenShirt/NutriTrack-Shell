@@ -85,8 +85,14 @@ export function Dashboard() {
   const handlePreferencesSave = (newPreferences: UserPreferences) => {
     savePreferences(newPreferences);
     setIsPreferencesOpen(false);
-    getGoals();
   };
+  
+  useEffect(() => {
+    if (isUserInitialized) {
+      getGoals();
+    }
+  }, [isUserInitialized, preferences, getGoals]);
+
 
   if (!isMealsInitialized || !isUserInitialized) {
     return (
@@ -164,17 +170,17 @@ export function Dashboard() {
         </div>
 
         {isLoadingGoals ? (
-          <div className="space-y-4">
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-4">
+            <div className="grid grid-cols-2 gap-4 md:grid-cols-2 lg:grid-cols-4">
                 <Skeleton className="h-[125px]" />
                 <Skeleton className="h-[125px]" />
                 <Skeleton className="h-[125px]" />
                 <Skeleton className="h-[125px]" />
             </div>
-            <Skeleton className="h-[400px] w-full" />
+            <Skeleton className="h-auto max-h-[400px] w-full" />
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="grid gap-4">
             <DailySummary meals={mealsForSelectedDate} goals={dailyGoals} />
             <MealList meals={mealsForSelectedDate} date={currentDate} />
           </div>
