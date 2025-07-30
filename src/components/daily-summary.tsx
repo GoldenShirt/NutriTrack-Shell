@@ -108,10 +108,10 @@ export function DailySummary({ meals, goals }: DailySummaryProps) {
   );
 
   const renderMicros = () => (
-    <div className="grid grid-cols-2 grid-rows-3 sm:grid-cols-3 sm:grid-rows-2 md:grid-cols-3 lg:grid-cols-5 gap-4 p-1">
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-5 gap-4 p-1">
       {microStats.map((stat, index) => (
         <div key={stat.title} className={cn({
-            "sm:col-start-2": index === 2 && microStats.length === 5,
+            "col-span-2 sm:col-span-1": index === 2 && microStats.length === 5,
          })}>
           <Card className="shadow-sm w-full h-full">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
