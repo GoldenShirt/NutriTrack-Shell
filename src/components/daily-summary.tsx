@@ -145,8 +145,7 @@ export function DailySummary({ meals, goals }: DailySummaryProps) {
         onClick={handleToggleClick}
         onTouchCancel={(e) => (e.target as HTMLElement).blur()}
         className={cn(
-            "absolute -left-3 top-1/2 -translate-y-1/2 z-10 opacity-0 transition-opacity",
-             "group-hover:opacity-100 sm:opacity-100"
+            "absolute -left-3 top-1/2 -translate-y-1/2 z-10 transition-opacity opacity-0 group-hover:opacity-100 sm:opacity-100"
         )}
       >
         <ArrowLeft className="h-4 w-4" />
@@ -157,8 +156,7 @@ export function DailySummary({ meals, goals }: DailySummaryProps) {
         onClick={handleToggleClick} 
         onTouchCancel={(e) => (e.target as HTMLElement).blur()}
         className={cn(
-            "absolute -right-3 top-1/2 -translate-y-1/2 z-10 opacity-0 transition-opacity",
-            "group-hover:opacity-100 sm:opacity-100"
+            "absolute -right-3 top-1/2 -translate-y-1/2 z-10 transition-opacity opacity-0 group-hover:opacity-100 sm:opacity-100"
         )}
       >
           <ArrowRight className="h-4 w-4" />
