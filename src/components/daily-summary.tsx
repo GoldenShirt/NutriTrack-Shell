@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Apple, Beef, Cookie, CookingPot, Leaf, Droplets, Wind, ShieldCheck, Bone } from "lucide-react";
@@ -51,7 +52,7 @@ export function DailySummary({ meals, goals }: DailySummaryProps) {
     <Carousel opts={{ loop: true }} className="w-full">
       <CarouselContent>
         <CarouselItem>
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {macroStats.map((stat) => (
               <Card key={stat.title} className="shadow-sm">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -70,7 +71,7 @@ export function DailySummary({ meals, goals }: DailySummaryProps) {
           </div>
         </CarouselItem>
         <CarouselItem>
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
              {microStats.map((stat) => (
                 <Card key={stat.title} className="shadow-sm">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -89,8 +90,8 @@ export function DailySummary({ meals, goals }: DailySummaryProps) {
           </div>
         </CarouselItem>
       </CarouselContent>
-      <CarouselPrevious className="absolute -left-4 top-1/2 -translate-y-1/2" />
-      <CarouselNext className="absolute -right-4 top-1/2 -translate-y-1/2" />
+      <CarouselPrevious />
+      <CarouselNext />
     </Carousel>
   );
 }
