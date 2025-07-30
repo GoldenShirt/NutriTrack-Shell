@@ -51,7 +51,7 @@ export function DailySummary({ meals, goals }: DailySummaryProps) {
     <Carousel opts={{ loop: true }} className="w-full">
       <CarouselContent>
         <CarouselItem>
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
             {macroStats.map((stat) => (
               <Card key={stat.title} className="shadow-sm">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
