@@ -19,7 +19,7 @@ import { format, isToday } from "date-fns";
 
 
 export function Dashboard() {
-  const { meals, isInitialized: isMealsInitialized } = useMealStore();
+  const { meals } = useMealStore();
   const { preferences, isInitialized: isUserInitialized, savePreferences } = useUserStore();
   
   const [isChatOpen, setIsChatOpen] = useState(false);
@@ -27,6 +27,11 @@ export function Dashboard() {
   
   const [dailyGoals, setDailyGoals] = useState<DailyGoals>(DEFAULT_GOALS);
   const [isLoadingGoals, setIsLoadingGoals] = useState(true);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const [currentDate, setCurrentDate] = useState(new Date());
 
@@ -94,7 +99,7 @@ export function Dashboard() {
   }, [isUserInitialized, preferences, getGoals]);
 
 
-  if (!isMealsInitialized || !isUserInitialized) {
+  if (!isMounted || !isUserInitialized) {
     return (
       <div className="space-y-4">
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

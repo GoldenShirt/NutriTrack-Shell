@@ -27,7 +27,7 @@ function formatMealHistory(meals: Meal[]): string {
   }  
 
 export function NutritionChat() {
-  const { meals, isInitialized: isMealsInitialized } = useMealStore();
+  const { meals } = useMealStore();
   const { preferences, setPreferences, isInitialized: isUserInitialized } = useUserStore();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
@@ -35,7 +35,12 @@ export function NutritionChat() {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const isInitialMessageFetched = useRef(false);
 
-  const isInitialized = isMealsInitialized && isUserInitialized;
+  const [isMounted, setIsMounted] = useState(false);
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  const isInitialized = isMounted && isUserInitialized;
 
   useEffect(() => {
     if (scrollAreaRef.current) {
