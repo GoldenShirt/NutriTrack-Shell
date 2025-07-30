@@ -71,7 +71,7 @@ export function DailySummary({ meals, goals }: DailySummaryProps) {
           </div>
         </CarouselItem>
         <CarouselItem>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
              {microStats.map((stat) => (
                 <Card key={stat.title} className="shadow-sm">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
