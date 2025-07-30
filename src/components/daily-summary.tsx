@@ -5,7 +5,7 @@ import { Apple, Beef, Bone, Cookie, CookingPot, Droplets, Leaf, ShieldCheck, Win
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import type { DailyGoals, Meal } from "@/lib/types";
-import { useMemo, useState, type TouchEvent } from "react";
+import { useMemo, useState, type TouchEvent, type MouseEvent } from "react";
 import { Button } from "./ui/button";
 import { cn } from "@/lib/utils";
 
@@ -32,6 +32,11 @@ export function DailySummary({ meals, goals }: DailySummaryProps) {
   
   const toggleView = () => {
     setView(v => v === 'macros' ? 'micros' : 'macros');
+  }
+  
+  const handleToggleClick = (e: MouseEvent<HTMLButtonElement>) => {
+    toggleView();
+    e.currentTarget.blur();
   }
 
   const handleTouchEnd = () => {
@@ -137,11 +142,11 @@ export function DailySummary({ meals, goals }: DailySummaryProps) {
       <Button 
         variant="outline" 
         size="icon" 
-        onClick={toggleView}
+        onClick={handleToggleClick}
         onTouchCancel={(e) => (e.target as HTMLElement).blur()}
         className={cn(
             "absolute -left-3 top-1/2 -translate-y-1/2 z-10 opacity-0 transition-opacity",
-             "group-hover:opacity-100 flex sm:opacity-100"
+             "group-hover:opacity-100 sm:opacity-100"
         )}
       >
         <ArrowLeft className="h-4 w-4" />
@@ -149,11 +154,11 @@ export function DailySummary({ meals, goals }: DailySummaryProps) {
       <Button 
         variant="outline" 
         size="icon" 
-        onClick={toggleView} 
+        onClick={handleToggleClick} 
         onTouchCancel={(e) => (e.target as HTMLElement).blur()}
         className={cn(
             "absolute -right-3 top-1/2 -translate-y-1/2 z-10 opacity-0 transition-opacity",
-            "group-hover:opacity-100 flex sm:opacity-100"
+            "group-hover:opacity-100 sm:opacity-100"
         )}
       >
           <ArrowRight className="h-4 w-4" />
