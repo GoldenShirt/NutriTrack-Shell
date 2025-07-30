@@ -65,8 +65,8 @@ const prompt = ai.definePrompt({
       - If healthGoals includes 'Gain Muscle' (and not 'Lose Weight'), add 500 calories.
       - Otherwise, use TDEE.
   4.  Determine macronutrient split based on goals:
-      - 'Lose Weight': 35% carbs, 40% protein, 25% fats.
-      - 'Gain Muscle': 45% carbs, 35% protein, 20% fats.
+      - If healthGoals includes 'Lose Weight': 35% carbs, 40% protein, 25% fats.
+      - If healthGoals includes 'Gain Muscle': 45% carbs, 35% protein, 20% fats.
       - Default ('Maintain Weight' etc.): 40% carbs, 30% protein, 30% fats.
   5.  Calculate grams for each macronutrient (Protein/Carbs: 4 cal/g, Fats: 9 cal/g).
 
