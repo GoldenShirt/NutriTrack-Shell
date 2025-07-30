@@ -44,9 +44,9 @@ export function NutritionChat() {
 
   useEffect(() => {
     if (scrollAreaRef.current) {
-        const scrollDiv = scrollAreaRef.current.querySelector("div");
-        if (scrollDiv) {
-            scrollDiv.scrollTo({ top: scrollDiv.scrollHeight, behavior: 'smooth' });
+        const viewport = scrollAreaRef.current.querySelector("div[data-radix-scroll-area-viewport]");
+        if (viewport) {
+            viewport.scrollTo({ top: viewport.scrollHeight, behavior: 'smooth' });
         }
     }
   }, [messages]);
