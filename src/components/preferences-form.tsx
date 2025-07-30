@@ -16,6 +16,7 @@ import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Form, FormControl, FormField, FormItem } from "./ui/form";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
+import { ScrollArea } from "./ui/scroll-area";
 
 interface PreferencesFormProps {
   currentPreferences: UserPreferences;
@@ -88,7 +89,7 @@ export function PreferencesForm({ currentPreferences, onSave }: PreferencesFormP
                     <TabsTrigger value="goals">Goals & Diet</TabsTrigger>
                     <TabsTrigger value="prefs">Preferences</TabsTrigger>
                 </TabsList>
-                <div className="pr-4 mt-4 max-h-[50vh] overflow-y-auto">
+                <ScrollArea className="pr-4 mt-4 max-h-[50vh] overflow-y-auto">
                     <TabsContent value="stats" className="space-y-6">
                         <div>
                             <Label className="font-semibold">Your Stats</Label>
@@ -280,7 +281,7 @@ export function PreferencesForm({ currentPreferences, onSave }: PreferencesFormP
                             )}
                         />
                     </TabsContent>
-                </div>
+                </ScrollArea>
             </Tabs>
 
             <DialogFooter className="pt-4">
