@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useRef, useEffect } from "react";
@@ -76,8 +77,17 @@ export function MealLogger({ onMealAdded }: MealLoggerProps) {
     if (isRecording) {
       recognitionRef.current.stop();
     } else {
-      recognitionRef.current.start();
-      setIsRecording(true);
+      try {
+        recognitionRef.current.start();
+        setIsRecording(true);
+      } catch (error) {
+        console.error("Could not start recognition", error);
+        toast({
+          variant: "destructive",
+          title: "Voice Error",
+          description: "Could not start voice recognition. Please check your microphone permissions.",
+        });
+      }
     }
   };
 
@@ -115,7 +125,7 @@ export function MealLogger({ onMealAdded }: MealLoggerProps) {
       });
     } catch (error) {
       console.error("Failed to analyze meal", error);
-      updateMeal(tempId, { status: 'complete' }); // or a new 'failed' status
+      updateMeal(tempId, { status: 'failed' }); // Use a 'failed' status
       toast({
         variant: "destructive",
         title: "Analysis Failed",

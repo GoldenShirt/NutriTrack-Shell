@@ -1,7 +1,7 @@
 
 "use client";
 
-import { Apple, Beef, Bone, Cookie, CookingPot, Droplets, Leaf, Loader2, ShieldCheck, Trash2, Wind } from "lucide-react";
+import { Apple, Beef, Bone, Cookie, CookingPot, Droplets, Leaf, Loader2, ShieldCheck, Trash2, Wind, AlertTriangle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { Meal } from "@/lib/types";
@@ -50,7 +50,7 @@ export function MealList({ meals, date }: MealListProps) {
       <CardContent className="p-2 md:p-4">
           <Accordion type="multiple" className="w-full space-y-2">
             {meals.map((meal) => (
-              <AccordionItem key={meal.id} value={meal.id} className={cn("relative rounded-lg border bg-card p-4 pr-12", meal.status === 'pending' && "opacity-60")}>
+              <AccordionItem key={meal.id} value={meal.id} className={cn("relative rounded-lg border bg-card p-4 pr-12", (meal.status === 'pending' || meal.status === 'failed') && "opacity-60")}>
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
                     <Button variant="ghost" size="icon" className="absolute top-3 right-2 h-7 w-7">
@@ -81,6 +81,12 @@ export function MealList({ meals, date }: MealListProps) {
                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
                             <Loader2 className="h-4 w-4 animate-spin" />
                             <span>Analyzing...</span>
+                        </div>
+                    )}
+                    {meal.status === 'failed' && (
+                        <div className="flex items-center gap-2 text-sm text-destructive">
+                            <AlertTriangle className="h-4 w-4" />
+                            <span>Analysis Failed</span>
                         </div>
                     )}
                 </div>

@@ -1,3 +1,4 @@
+
 import type { AnalyzeMealOutput } from "@/ai/flows/analyze-meal";
 import { z } from "zod";
 
@@ -5,7 +6,7 @@ export interface Meal extends AnalyzeMealOutput {
   id: string;
   date: string; // ISO string
   description: string;
-  status: 'pending' | 'complete';
+  status: 'pending' | 'complete' | 'failed';
 }
 
 export interface ChatMessage {
