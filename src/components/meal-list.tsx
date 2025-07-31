@@ -4,7 +4,6 @@
 import { Apple, Beef, Bone, Cookie, CookingPot, Droplets, Leaf, Loader2, ShieldCheck, Trash2, Wind } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import type { Meal } from "@/lib/types";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { format, isToday } from "date-fns";
@@ -49,7 +48,6 @@ export function MealList({ meals, date }: MealListProps) {
         <CardTitle className="font-headline">{dateLabel}</CardTitle>
       </CardHeader>
       <CardContent className="p-2">
-        <ScrollArea className="h-auto max-h-[400px]">
           <Accordion type="multiple" className="w-full space-y-1">
             {meals.map((meal) => (
               <AccordionItem key={meal.id} value={meal.id} className={cn("relative rounded-lg border bg-card p-3 pr-10", meal.status === 'pending' && "opacity-60")}>
@@ -120,7 +118,6 @@ export function MealList({ meals, date }: MealListProps) {
               </AccordionItem>
             ))}
           </Accordion>
-        </ScrollArea>
       </CardContent>
     </Card>
   );
