@@ -47,13 +47,13 @@ export function MealList({ meals, date }: MealListProps) {
       <CardHeader>
         <CardTitle className="font-headline">{dateLabel}</CardTitle>
       </CardHeader>
-      <CardContent className="p-2">
-          <Accordion type="multiple" className="w-full space-y-1">
+      <CardContent className="p-2 md:p-4">
+          <Accordion type="multiple" className="w-full space-y-2">
             {meals.map((meal) => (
-              <AccordionItem key={meal.id} value={meal.id} className={cn("relative rounded-lg border bg-card p-3 pr-10", meal.status === 'pending' && "opacity-60")}>
+              <AccordionItem key={meal.id} value={meal.id} className={cn("relative rounded-lg border bg-card p-4 pr-12", meal.status === 'pending' && "opacity-60")}>
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
-                    <Button variant="ghost" size="icon" className="absolute top-2 right-1 h-7 w-7">
+                    <Button variant="ghost" size="icon" className="absolute top-3 right-2 h-7 w-7">
                         <Trash2 className="h-4 w-4 text-muted-foreground hover:text-destructive" />
                     </Button>
                   </AlertDialogTrigger>
@@ -94,7 +94,7 @@ export function MealList({ meals, date }: MealListProps) {
                       <div className="flex items-center gap-2"><Cookie className="h-4 w-4 text-purple-500" /> Fats: {meal.fats.toFixed(0)}g</div>
                     </div>
                     
-                    <AccordionTrigger className="text-xs text-muted-foreground hover:no-underline">Show More</AccordionTrigger>
+                    <AccordionTrigger className="p-0 text-xs text-muted-foreground hover:no-underline">Show More</AccordionTrigger>
                     
                     <AccordionContent>
                       <div className="mt-3 grid grid-cols-2 gap-2 text-sm sm:grid-cols-3">

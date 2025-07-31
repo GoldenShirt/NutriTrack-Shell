@@ -101,7 +101,12 @@ export function Dashboard() {
 
   if (!isMounted || !isUserInitialized) {
     return (
-      <div className="space-y-4">
+      <div className="space-y-4 p-4 md:p-0">
+        <div className="flex items-center justify-center gap-4">
+          <Skeleton className="h-10 w-10" />
+          <Skeleton className="h-7 w-40" />
+          <Skeleton className="h-10 w-10" />
+        </div>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
            <Skeleton className="h-32" />
            <Skeleton className="h-32" />
