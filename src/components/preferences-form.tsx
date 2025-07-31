@@ -17,6 +17,19 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Form, FormControl, FormField, FormItem } from "./ui/form";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { ScrollArea } from "./ui/scroll-area";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { useMealStore } from "@/hooks/use-meal-store";
+import { useToast } from "@/hooks/use-toast";
 
 interface PreferencesFormProps {
   currentPreferences: UserPreferences;
@@ -41,7 +54,10 @@ const defaultDietaryOptions = ["Vegetarian", "Vegan", "Gluten-Free", "Dairy-Free
 const defaultGoalOptions = ["Lose Weight", "Gain Muscle", "Maintain Weight", "Improve Endurance", "Eat Healthier"];
 
 export function PreferencesForm({ currentPreferences, onSave }: PreferencesFormProps) {
-  const { savePreferences } = useUserStore();
+  const { savePreferences, clearPreferences } = useUserStore();
+  const { clearAllMeals } = useMealStore();
+  const { toast } = useToast();
+
   const form = useForm<z.infer<typeof preferencesSchema>>({
     resolver: zodResolver(preferencesSchema),
     defaultValues: {
@@ -85,6 +101,16 @@ export function PreferencesForm({ currentPreferences, onSave }: PreferencesFormP
     savePreferences(newPreferences);
     onSave(newPreferences);
   };
+  
+  const handleDeleteAllData = () => {
+    clearPreferences();
+    clearAllMeals();
+    toast({
+        title: "Data Cleared",
+        description: "All your meals and preferences have been deleted.",
+    });
+    onSave(initialPreferences);
+  }
 
   return (
     <Form {...form}>
@@ -322,10 +348,43 @@ export function PreferencesForm({ currentPreferences, onSave }: PreferencesFormP
                 </ScrollArea>
             </Tabs>
 
-            <DialogFooter className="pt-4">
+            <DialogFooter className="pt-4 flex justify-between w-full">
+                <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                        <Button type="button" variant="destructive">Delete All Data</Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                        <AlertDialogHeader>
+                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            This action cannot be undone. This will permanently delete all of your meal history and personal preferences.
+                        </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleDeleteAllData}>Continue</AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
                 <Button type="submit">Save Preferences</Button>
             </DialogFooter>
         </form>
     </Form>
   );
 }
+
+const initialPreferences: UserPreferences = {
+    dietaryRestrictions: [],
+    healthGoals: [],
+    likes: [],
+    dislikes: [],
+    sex: undefined,
+    age: undefined,
+    height: undefined,
+    weight: undefined,
+    activityLevel: 'sedentary',
+    geminiApiKey: undefined,
+    whisperApiKey: undefined,
+};
+
+    

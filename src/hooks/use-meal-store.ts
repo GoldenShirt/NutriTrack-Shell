@@ -1,3 +1,4 @@
+
 "use client";
 
 import { create } from 'zustand';
@@ -11,6 +12,7 @@ interface MealStoreState {
   addMeal: (meal: Meal) => void;
   updateMeal: (mealId: string, updates: Partial<Meal>) => void;
   deleteMeal: (mealId: string) => void;
+  clearAllMeals: () => void;
   getMeals: () => Meal[];
 }
 
@@ -32,6 +34,7 @@ export const useMealStore = create<MealStoreState>()(
         set((state) => ({
             meals: state.meals.filter((meal) => meal.id !== mealId),
         })),
+      clearAllMeals: () => set({ meals: [] }),
       getMeals: () => get().meals,
     }),
     {
@@ -40,3 +43,5 @@ export const useMealStore = create<MealStoreState>()(
     }
   )
 );
+
+    

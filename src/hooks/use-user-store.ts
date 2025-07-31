@@ -50,6 +50,19 @@ export function useUserStore() {
         console.error("Failed to save user data to localStorage", error);
       }
   }, []);
+  
+  const clearPreferences = useCallback(() => {
+    setPreferences(initialPreferences);
+    try {
+      if (typeof window !== "undefined") {
+        localStorage.removeItem(STORE_KEY);
+      }
+    } catch (error) {
+      console.error("Failed to clear user data from localStorage", error);
+    }
+  }, []);
 
-  return { preferences, setPreferences: savePreferences, savePreferences, isInitialized };
+  return { preferences, setPreferences: savePreferences, savePreferences, clearPreferences, isInitialized };
 }
+
+    
