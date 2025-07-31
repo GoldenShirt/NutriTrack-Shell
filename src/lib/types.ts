@@ -25,6 +25,8 @@ export interface UserPreferences {
   height?: number;
   weight?: number;
   activityLevel?: "sedentary" | "light" | "moderate" | "active" | "very_active";
+  geminiApiKey?: string;
+  whisperApiKey?: string;
 }
 
 export const CalculateGoalsOutputSchema = z.object({

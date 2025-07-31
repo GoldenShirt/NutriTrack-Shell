@@ -15,7 +15,9 @@ const initialPreferences: UserPreferences = {
   age: undefined,
   height: undefined,
   weight: undefined,
-  activityLevel: 'sedentary'
+  activityLevel: 'sedentary',
+  geminiApiKey: undefined,
+  whisperApiKey: undefined,
 };
 
 export function useUserStore() {

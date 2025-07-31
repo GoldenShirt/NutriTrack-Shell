@@ -33,6 +33,8 @@ const preferencesSchema = z.object({
   height: z.coerce.number().optional(),
   weight: z.coerce.number().optional(),
   activityLevel: z.enum(["sedentary", "light", "moderate", "active", "very_active"]).optional(),
+  geminiApiKey: z.string().optional(),
+  whisperApiKey: z.string().optional(),
 });
 
 const defaultDietaryOptions = ["Vegetarian", "Vegan", "Gluten-Free", "Dairy-Free", "Nut-Allergy"];
@@ -52,6 +54,8 @@ export function PreferencesForm({ currentPreferences, onSave }: PreferencesFormP
       height: currentPreferences.height || undefined,
       weight: currentPreferences.weight || undefined,
       activityLevel: currentPreferences.activityLevel || 'sedentary',
+      geminiApiKey: currentPreferences.geminiApiKey || '',
+      whisperApiKey: currentPreferences.whisperApiKey || '',
     },
   });
 
@@ -66,6 +70,8 @@ export function PreferencesForm({ currentPreferences, onSave }: PreferencesFormP
         height: currentPreferences.height || undefined,
         weight: currentPreferences.weight || undefined,
         activityLevel: currentPreferences.activityLevel || 'sedentary',
+        geminiApiKey: currentPreferences.geminiApiKey || '',
+        whisperApiKey: currentPreferences.whisperApiKey || '',
     });
   }, [currentPreferences, form.reset]);
 
@@ -84,10 +90,11 @@ export function PreferencesForm({ currentPreferences, onSave }: PreferencesFormP
     <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 p-1">
             <Tabs defaultValue="stats" className="w-full">
-                <TabsList className="grid w-full grid-cols-3">
+                <TabsList className="grid w-full grid-cols-4">
                     <TabsTrigger value="stats">Your Stats</TabsTrigger>
                     <TabsTrigger value="goals">Goals & Diet</TabsTrigger>
                     <TabsTrigger value="prefs">Preferences</TabsTrigger>
+                    <TabsTrigger value="apis">APIs</TabsTrigger>
                 </TabsList>
                 <ScrollArea className="pr-4 mt-4 h-[55vh]">
                     <div className="pr-2">
@@ -282,6 +289,35 @@ export function PreferencesForm({ currentPreferences, onSave }: PreferencesFormP
                                 )}
                             />
                         </TabsContent>
+                        <TabsContent value="apis" className="space-y-6 mt-0">
+                            <FormField
+                                control={form.control}
+                                name="geminiApiKey"
+                                render={({ field }) => (
+                                    <FormItem>
+                                    <Label className="font-semibold">Gemini API Key</Label>
+                                    <p className="text-sm text-muted-foreground">Your Google AI API key for generative features.</p>
+                                    <FormControl>
+                                        <Input type="password" placeholder="Enter your Gemini API key" {...field} />
+                                    </FormControl>
+                                    </FormItem>
+                                )}
+                                />
+
+                            <FormField
+                                control={form.control}
+                                name="whisperApiKey"
+                                render={({ field }) => (
+                                    <FormItem>
+                                    <Label className="font-semibold">Whisper API Key</Label>
+                                    <p className="text-sm text-muted-foreground">Your API key for voice recognition services.</p>
+                                    <FormControl>
+                                        <Input type="password" placeholder="Enter your Whisper API key" {...field} />
+                                    </FormControl>
+                                    </FormItem>
+                                )}
+                            />
+                        </TabsContent>
                     </div>
                 </ScrollArea>
             </Tabs>
@@ -293,5 +329,3 @@ export function PreferencesForm({ currentPreferences, onSave }: PreferencesFormP
     </Form>
   );
 }
-
-    
