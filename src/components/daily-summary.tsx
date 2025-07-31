@@ -1,4 +1,3 @@
-
 "use client";
 
 import { Apple, Beef, Bone, Cookie, CookingPot, Droplets, Leaf, ShieldCheck, Wind, ArrowLeft, ArrowRight } from "lucide-react";
@@ -30,12 +29,8 @@ export function DailySummary({ meals, goals }: DailySummaryProps) {
     setTouchEndX(e.targetTouches[0].clientX);
   };
   
-  const toggleView = (e?: MouseEvent<HTMLButtonElement>) => {
+  const toggleView = () => {
     setView(v => v === 'macros' ? 'micros' : 'macros');
-    if (e) {
-      // This is a common pattern to prevent the button from staying in a focused/active state after being clicked, especially on mobile.
-      e.currentTarget.blur();
-    }
   }
 
   const handleTouchEnd = () => {
@@ -51,7 +46,6 @@ export function DailySummary({ meals, goals }: DailySummaryProps) {
     setTouchStartX(null);
     setTouchEndX(null);
   };
-
 
   const summary = useMemo(() => {
     return meals.reduce(
@@ -142,7 +136,7 @@ export function DailySummary({ meals, goals }: DailySummaryProps) {
         size="icon" 
         onClick={toggleView}
         className={cn(
-            "absolute -left-3 top-1/2 -translate-y-1/2 z-10 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity no-tap-highlight"
+            "absolute -left-3 top-1/2 -translate-y-1/2 z-10 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity macro-micro-nav-button"
         )}
       >
         <ArrowLeft className="h-4 w-4" />
@@ -150,9 +144,9 @@ export function DailySummary({ meals, goals }: DailySummaryProps) {
       <Button 
         variant="outline" 
         size="icon" 
-        onClick={toggleView} 
+        onClick={toggleView}
         className={cn(
-            "absolute -right-3 top-1/2 -translate-y-1/2 z-10 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity no-tap-highlight"
+            "absolute -right-3 top-1/2 -translate-y-1/2 z-10 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity macro-micro-nav-button"
         )}
       >
           <ArrowRight className="h-4 w-4" />

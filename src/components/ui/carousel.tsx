@@ -1,4 +1,3 @@
-
 "use client"
 
 import * as React from "react"
@@ -194,6 +193,31 @@ const CarouselItem = React.forwardRef<
   )
 })
 CarouselItem.displayName = "CarouselItem"
+
+// Add these CSS classes to your carousel button components:
+
+// For the previous/next buttons, add these event handlers:
+const handleButtonClick = (callback: () => void) => {
+  return (e: React.MouseEvent<HTMLButtonElement>) => {
+    callback();
+    // Remove focus after click to prevent stuck appearance on mobile
+    e.currentTarget.blur();
+  };
+};
+
+// And apply blur() on touch events:
+const handleTouchEnd = (e: React.TouchEvent<HTMLButtonElement>) => {
+  e.currentTarget.blur();
+};
+
+// Example usage in your button JSX:
+<button
+  //onClick={handleButtonClick(scrollPrev)}
+  //onTouchEnd={handleTouchEnd}
+  //className="your-existing-classes focus:outline-none active:scale-95 transition-transform"
+>
+  <ArrowLeft className="h-4 w-4" />
+</button>
 
 const CarouselPrevious = React.forwardRef<
   HTMLButtonElement,
