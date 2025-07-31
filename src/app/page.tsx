@@ -8,17 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Icons } from "@/components/icons";
 import { Dashboard } from "@/components/dashboard";
 import type { Meal } from "@/lib/types";
-import dynamic from 'next/dynamic';
-import { Skeleton } from "@/components/ui/skeleton";
-
-const MealLogger = dynamic(() => import('@/components/meal-logger').then(mod => mod.MealLogger), {
-  ssr: false,
-  loading: () => <div className="p-2 space-y-4">
-      <Skeleton className="h-6 w-1/2" />
-      <Skeleton className="h-24 w-full" />
-      <Skeleton className="h-10 w-full" />
-    </div>
-});
+import { MealLogger } from "@/components/meal-logger";
 
 export default function Home() {
   const [isLogMealOpen, setIsLogMealOpen] = useState(false);
