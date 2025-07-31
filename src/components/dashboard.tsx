@@ -221,7 +221,7 @@ export function Dashboard() {
             <Skeleton className="h-[400px] w-full" />
           </div>
         ) : (
-          <div className="grid gap-2 md:gap-4">
+          <div className="grid gap-2">
             <DailySummary meals={mealsForSelectedDate} goals={dailyGoals} />
             <MealList meals={mealsForSelectedDate} date={currentDate} />
           </div>
