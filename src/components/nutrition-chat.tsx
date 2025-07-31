@@ -63,7 +63,7 @@ export function NutritionChat() {
           const welcomeMessage: ChatMessage = {
             id: Date.now().toString(),
             role: "assistant",
-            message: "Welcome! To give you the best advice, I need to know a bit about you. For example, are you vegetarian, vegan, or have any allergies? What are your main health goals right now?\n\nYou can tell me here, or use the settings button to set your preferences.",
+            message: "Welcome! To give you the best advice, I need to know a bit about you. Please use the settings button to set your stats, goals, and dietary preferences.\n\nTo enable all AI features, please also add your API keys in the 'APIs' tab in settings.",
           };
           setMessages([welcomeMessage]);
           setIsLoading(false);
