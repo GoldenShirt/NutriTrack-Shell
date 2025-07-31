@@ -44,10 +44,10 @@ export function MealList({ meals, date }: MealListProps) {
 
   return (
     <Card className="shadow-sm">
-      <CardHeader>
+      <CardHeader className="px-4 pt-4 pb-2 md:px-6 md:pt-6 md:pb-3">
         <CardTitle className="font-headline">{dateLabel}</CardTitle>
       </CardHeader>
-      <CardContent className="p-2 md:p-4">
+      <CardContent className="p-2 pt-0 md:p-4 md:pt-0">
           <Accordion type="multiple" className="w-full space-y-2">
             {meals.map((meal) => (
               <AccordionItem key={meal.id} value={meal.id} className={cn("relative rounded-lg border bg-card p-4 pr-12", (meal.status === 'pending' || meal.status === 'failed') && "opacity-60")}>
