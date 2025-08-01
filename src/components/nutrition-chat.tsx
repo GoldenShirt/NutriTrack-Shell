@@ -14,16 +14,17 @@ import { nutritionChatAction } from "@/app/actions";
 import { cn } from "@/lib/utils";
 
 function formatMealHistory(meals: Meal[]): string {
-    if (meals.length === 0) {
-      return "No meals logged in the last 7 days.";
-    }
-
-    const summary = meals
-      .map((meal) => `- On ${new Date(meal.date).toLocaleDateString()}, user ate: ${meal.description}. (Calories: ${meal.calories.toFixed(0)}, Protein: ${meal.protein.toFixed(0)}g, Carbs: ${meal.carbs.toFixed(0)}g, Fats: ${meal.fats.toFixed(0)}g)`)
-      .join("\\n");
-
-    return `Here is a summary of the user's logged meals from the past 7 days:\\n${summary}`;
+  if (meals.length === 0) {
+    return "No meals logged in the last 7 days.";
   }
+
+  const summary = meals
+    .map((meal) => `- On ${new Date(meal.date).toLocaleDateString()}, user ate: ${meal.description}. (Calories: ${meal.calories.toFixed(0)}, Protein: ${meal.protein.toFixed(0)}g, Carbs: ${meal.carbs.toFixed(0)}g, Fats: ${meal.fats.toFixed(0)}g)`)
+    .join("\\n"); // Corrected newline escape for code
+
+  return `Here is a summary of the user's logged meals from the past 7 days:\n${summary}`;
+}
+
 
 export function NutritionChat() {
   const { meals } = useMealStore();
@@ -59,6 +60,9 @@ export function NutritionChat() {
             id: Date.now().toString(),
             role: "assistant",
             message: "Welcome! To give you the best advice, I need to know a bit about you. Please use the settings button to set your stats, goals, and dietary preferences.\\n\\nTo enable all AI features, please also add your API keys in the 'APIs' tab in settings.",
+          
+
+
           };
           setMessages([welcomeMessage]);
           setIsLoading(false);
@@ -188,7 +192,7 @@ export function NutritionChat() {
                     : "bg-card border"
                 )}
               >
-                <p className=\"whitespace-pre-wrap\">{msg.message}</p>
+                <p className="whitespace-pre-wrap">{msg.message}</p>
               </div>
               {msg.role === "user" && (
                 <Avatar className="h-8 w-8">
@@ -196,4 +200,34 @@ export function NutritionChat() {
                 </Avatar>
               )}
             </div>
-          ))}\n           {isLoading && (\n            <div className=\"flex items-start gap-3 justify-start\">\n              <Avatar className=\"h-8 w-8\">\n                  <AvatarFallback className=\"bg-primary text-primary-foreground\"><Bot className=\"h-5 w-5\"/></AvatarFallback>\n              </Avatar>\n              <div className=\"max-w-xs rounded-lg p-3 text-sm md:max-w-md bg-card border\">\n                <Loader2 className=\"h-5 w-5 animate-spin\" />\n              </div>\n            </div>\n          )}\n        </div>\n      </ScrollArea>\n      <div className=\"border-t p-4\">\n        <form onSubmit={handleSubmit} className=\"flex items-center gap-2\">\n          <Input\n            value={input}\n            onChange={(e) => setInput(e.target.value)}\n            placeholder=\"Ask a question...\"\n            className=\"flex-1\"\n            disabled={isLoading || !isInitialized}\n          />\n          <Button type=\"submit\" size=\"icon\" disabled={isLoading || !input.trim() || !isInitialized}>\n            {isLoading && messages.length > 0 ? <Loader2 className=\"h-4 w-4 animate-spin\" /> : <Send className=\"h-4 w-4\" />}\n            <span className=\"sr-only\">Send</span>\n          </Button>\n        </form>\n      </div>\n    </div>\n  );\n}\n
+          ))}
+           {isLoading && (
+            <div className="flex items-start gap-3 justify-start">
+              <Avatar className="h-8 w-8">
+                  <AvatarFallback className="bg-primary text-primary-foreground"><Bot className="h-5 w-5"/></AvatarFallback>
+              </Avatar>
+              <div className="max-w-xs rounded-lg p-3 text-sm md:max-w-md bg-card border">
+                <Loader2 className="h-5 w-5 animate-spin" />
+              </div>
+            </div>
+          )}
+        </div>
+      </ScrollArea>
+      <div className="border-t p-4">
+        <form onSubmit={handleSubmit} className="flex items-center gap-2">
+          <Input
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Ask a question..."
+            className="flex-1"
+            disabled={isLoading || !isInitialized}
+          />
+          <Button type="submit" size="icon" disabled={isLoading || !input.trim() || !isInitialized}>
+            {isLoading && messages.length > 0 ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+            <span className="sr-only">Send</span>
+          </Button>
+        </form>
+      </div>
+    </div>
+  );
+}
