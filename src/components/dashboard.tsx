@@ -20,17 +20,12 @@ import { DailySummary } from "@/components/daily-summary";
 export function Dashboard() {
   const { meals } = useMealStore();
   const { preferences, isInitialized: isUserInitialized, savePreferences } = useUserStore();
-  
+
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isPreferencesOpen, setIsPreferencesOpen] = useState(false);
-  
+
   const [dailyGoals, setDailyGoals] = useState<DailyGoals>(DEFAULT_GOALS);
   const [isLoadingGoals, setIsLoadingGoals] = useState(true);
-  const [isMounted, setIsMounted] = useState(false);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
 
   const [currentDate, setCurrentDate] = useState(new Date());
 
@@ -45,7 +40,7 @@ export function Dashboard() {
     newDate.setDate(newDate.getDate() + 1);
     setCurrentDate(newDate);
   };
-  
+
   const handleBackToToday = () => {
       setCurrentDate(new Date());
   }
@@ -83,22 +78,18 @@ export function Dashboard() {
   }, [isUserInitialized, preferences]);
 
   useEffect(() => {
-    getGoals();
-  }, [getGoals]);
-
-  const handlePreferencesSave = (newPreferences: UserPreferences) => {
-    savePreferences(newPreferences);
-    setIsPreferencesOpen(false);
-  };
-  
-  useEffect(() => {
     if (isUserInitialized) {
       getGoals();
     }
   }, [isUserInitialized, preferences, getGoals]);
 
+  const handlePreferencesSave = (newPreferences: UserPreferences) => {
+    savePreferences(newPreferences);
+    setIsPreferencesOpen(false);
+  };
 
-  if (!isMounted || !isUserInitialized) {
+
+  if (!isUserInitialized) {
     return (
       <div className="space-y-4 p-4 md:p-0">
         <div className="flex items-center justify-center gap-4">
@@ -116,7 +107,7 @@ export function Dashboard() {
       </div>
     )
   }
-  
+
   const isViewingToday = isToday(currentDate);
 
   return (
