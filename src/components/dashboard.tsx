@@ -2,7 +2,6 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import dynamic from 'next/dynamic';
 import { useMealStore } from "@/hooks/use-meal-store";
 import { MealList } from "@/components/meal-list";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -14,40 +13,9 @@ import { calculateGoalsAction } from "@/app/actions";
 import { DEFAULT_GOALS } from "@/lib/constants";
 import type { DailyGoals, UserPreferences } from "@/lib/types";
 import { format, isToday } from "date-fns";
-
-const NutritionChat = dynamic(() => import('@/components/nutrition-chat').then(mod => mod.NutritionChat), {
-  ssr: false,
-  loading: () => <div className="p-4 space-y-4">
-    <div className="flex items-start gap-3 justify-start">
-        <Skeleton className="h-8 w-8 rounded-full" />
-        <Skeleton className="h-12 w-48 rounded-lg" />
-    </div>
-    <div className="flex items-start gap-3 justify-end">
-        <Skeleton className="h-12 w-48 rounded-lg" />
-        <Skeleton className="h-8 w-8 rounded-full" />
-    </div>
-  </div>
-});
-
-const PreferencesForm = dynamic(() => import('./preferences-form').then(mod => mod.PreferencesForm), {
-  ssr: false,
-  loading: () => <div className="space-y-4 p-1">
-      <Skeleton className="h-10 w-full" />
-      <Skeleton className="h-48 w-full" />
-      <Skeleton className="h-10 w-24 self-end" />
-    </div>
-});
-
-const DailySummary = dynamic(() => import('@/components/daily-summary').then(mod => mod.DailySummary), {
-    ssr: false,
-    loading: () => <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-1">
-        <Skeleton className="h-[125px]" />
-        <Skeleton className="h-[125px]" />
-        <Skeleton className="h-[125px]" />
-        <Skeleton className="h-[125px]" />
-    </div>
-});
-
+import { NutritionChat } from "@/components/nutrition-chat";
+import { PreferencesForm } from "./preferences-form";
+import { DailySummary } from "@/components/daily-summary";
 
 export function Dashboard() {
   const { meals } = useMealStore();
@@ -221,9 +189,11 @@ export function Dashboard() {
             <Skeleton className="h-[400px] w-full" />
           </div>
         ) : (
-          <div className="flex flex-col gap-1.5">
+          <div className="flex flex-col">
             <DailySummary meals={mealsForSelectedDate} goals={dailyGoals} />
-            <MealList meals={mealsForSelectedDate} date={currentDate} />
+            <div className="mt-[5px]">
+              <MealList meals={mealsForSelectedDate} date={currentDate} />
+            </div>
           </div>
         )}
       </div>
