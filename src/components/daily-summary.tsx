@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Apple, Beef, Bone, Cookie, CookingPot, Droplets, Leaf, ShieldCheck, Wind, ArrowLeft, ArrowRight } from "lucide-react";
@@ -138,24 +139,20 @@ export function DailySummary({ meals, goals }: DailySummaryProps) {
 
   const renderMicros = () => (
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-5 gap-4 p-1">
-      {microStats.map((stat, index) => (
-        <div key={stat.title} className={cn({
-            "col-span-2 sm:col-span-1": index === 2 && microStats.length === 5,
-         })}>
-          <Card className="shadow-sm w-full h-full">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
-              <stat.icon className={`h-4 w-4 text-muted-foreground ${stat.color}`} />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {stat.value.toFixed(1)}
-                <span className="text-xs text-muted-foreground">/{stat.goal}{stat.unit}</span>
-              </div>
-              <Progress value={stat.goal > 0 ? (stat.value / stat.goal) * 100 : 0} className="mt-2 h-2" />
-            </CardContent>
-          </Card>
-        </div>
+      {microStats.map((stat) => (
+        <Card key={stat.title} className="shadow-sm">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
+            <stat.icon className={`h-4 w-4 text-muted-foreground ${stat.color}`} />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {stat.value.toFixed(1)}
+              <span className="text-xs text-muted-foreground">/{stat.goal}{stat.unit}</span>
+            </div>
+            <Progress value={stat.goal > 0 ? (stat.value / stat.goal) * 100 : 0} className="mt-2 h-2" />
+          </CardContent>
+        </Card>
       ))}
     </div>
   );
