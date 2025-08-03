@@ -5,9 +5,8 @@ import { Apple, Beef, Bone, Cookie, CookingPot, Droplets, Leaf, ShieldCheck, Win
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import type { DailyGoals, Meal } from "@/lib/types";
-import { useMemo, useState, useCallback, useRef, type TouchEvent } from "react";
+import { useMemo, useState, useCallback, useRef } from "react";
 import { Button } from "./ui/button";
-import { cn } from "@/lib/utils";
 
 interface DailySummaryProps {
   meals: Meal[];
@@ -16,73 +15,34 @@ interface DailySummaryProps {
 
 export function DailySummary({ meals, goals }: DailySummaryProps) {
   const [view, setView] = useState<'macros' | 'micros'>('macros');
-  const [touchStartX, setTouchStartX] = useState<number | null>(null);
-  const [touchEndX, setTouchEndX] = useState<number | null>(null);
   const [isToggling, setIsToggling] = useState(false);
   const leftButtonRef = useRef<HTMLButtonElement>(null);
   const rightButtonRef = useRef<HTMLButtonElement>(null);
 
-  const minSwipeDistance = 50;
-
-  const handleTouchStart = useCallback((e: TouchEvent) => {
-    setTouchEndX(null);
-    setTouchStartX(e.targetTouches[0].clientX);
-  }, []);
-
-  const handleTouchMove = useCallback((e: TouchEvent) => {
-    setTouchEndX(e.targetTouches[0].clientX);
-  }, []);
-
-  const toggleView = useCallback((shouldBlurButtons: boolean = false) => {
+  const toggleView = useCallback(() => {
     if (isToggling) return;
     setIsToggling(true);
     setView(v => v === 'macros' ? 'micros' : 'macros');
 
-    // Only blur buttons if explicitly requested (button clicks, not swipes)
-    if (shouldBlurButtons) {
-      setTimeout(() => {
-        leftButtonRef.current?.blur();
-        rightButtonRef.current?.blur();
-      }, 50);
-    }
+    setTimeout(() => {
+      leftButtonRef.current?.blur();
+      rightButtonRef.current?.blur();
+    }, 50);
 
     // Reset toggle lock after animation completes
     setTimeout(() => setIsToggling(false), 300);
   }, [isToggling]);
 
-  const handleTouchEnd = useCallback(() => {
-    if (!touchStartX || !touchEndX || isToggling) return;
-
-    const distance = touchStartX - touchEndX;
-    const isLeftSwipe = distance > minSwipeDistance;
-    const isRightSwipe = distance < -minSwipeDistance;
-
-    if (isLeftSwipe || isRightSwipe) {
-      // Don't blur buttons when swiping
-      toggleView(false);
-    }
-
-    setTouchStartX(null);
-    setTouchEndX(null);
-  }, [touchStartX, touchEndX, isToggling, toggleView]);
-
-  // Simple button handler that prevents default and manages focus properly
   const handleButtonClick = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    if (isToggling) return;
-
-    // Blur buttons when clicking them directly
-    toggleView(true);
-  }, [isToggling, toggleView]);
+    toggleView();
+  }, [toggleView]);
 
   // Touch handler for mobile button taps
   const handleButtonTouch = useCallback((e: React.TouchEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    if (isToggling) return;
-
-    // Blur buttons when tapping them directly
-    toggleView(true);
-  }, [isToggling, toggleView]);
+    toggleView();
+  }, [toggleView]);
 
   const summary = useMemo(() => {
     return meals.reduce(
@@ -160,9 +120,6 @@ export function DailySummary({ meals, goals }: DailySummaryProps) {
   return (
     <div
       className="w-full relative group"
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
     >
       <div key={view} className="animate-fade-in">
         {view === 'macros' ? renderMacros() : renderMicros()}

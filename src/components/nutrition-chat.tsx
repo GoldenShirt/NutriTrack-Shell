@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useRef, useEffect } from "react";
@@ -35,8 +36,6 @@ export function NutritionChat() {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const isInitialMessageFetched = useRef(false);
 
-  const isInitialized = isUserInitialized; // Removed isMounted
-
 
   useEffect(() => {
     if (scrollAreaRef.current) {
@@ -48,7 +47,7 @@ export function NutritionChat() {
   }, [messages]);
 
   useEffect(() => {
-    if (isInitialized && !isInitialMessageFetched.current) {
+    if (isUserInitialized && !isInitialMessageFetched.current) {
       const getInitialInsights = async () => {
         setIsLoading(true);
         isInitialMessageFetched.current = true;
@@ -102,7 +101,7 @@ export function NutritionChat() {
 
       getInitialInsights();
     }
-  }, [isInitialized, meals, preferences]);
+  }, [isUserInitialized, meals, preferences]);
 
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -152,19 +151,22 @@ export function NutritionChat() {
     }
   };
 
-  const hasPreferences = preferences.dietaryRestrictions?.length || preferences.healthGoals?.length;
 
   return (
     <div className="flex h-full flex-col">
       <ScrollArea className="flex-1" ref={scrollAreaRef}>
         <div className="space-y-6 p-4">
-          {messages.length === 0 && !isLoading && !hasPreferences && (
-              <div className="text-center text-sm text-muted-foreground p-8 flex flex-col items-center gap-4">
-                <Sparkles className="h-6 w-6 text-primary" />
-                <p>Welcome! Let's set your nutrition goals to get started.</p>
+          {messages.length === 0 && isLoading && (
+            <div className="flex items-start gap-3 justify-start">
+              <Avatar className="h-8 w-8">
+                  <AvatarFallback className="bg-primary text-primary-foreground"><Bot className="h-5 w-5"/></AvatarFallback>
+              </Avatar>
+              <div className="max-w-xs rounded-lg p-3 text-sm md:max-w-md bg-card border">
+                <Loader2 className="h-5 w-5 animate-spin" />
               </div>
+            </div>
           )}
-          {messages.length === 0 && !isLoading && hasPreferences && (
+          {messages.length === 0 && !isLoading && (
               <div className="text-center text-sm text-muted-foreground p-8 flex flex-col items-center gap-2">
                 <Sparkles className="h-6 w-6 text-primary" />
                 <p>Your AI Nutrition Coach is ready.</p>
@@ -201,7 +203,7 @@ export function NutritionChat() {
               )}
             </div>
           ))}
-           {isLoading && (
+           {isLoading && messages.length > 0 && (
             <div className="flex items-start gap-3 justify-start">
               <Avatar className="h-8 w-8">
                   <AvatarFallback className="bg-primary text-primary-foreground"><Bot className="h-5 w-5"/></AvatarFallback>
@@ -220,10 +222,10 @@ export function NutritionChat() {
             onChange={(e) => setInput(e.target.value)}
             placeholder="Ask a question..."
             className="flex-1"
-            disabled={isLoading || !isInitialized}
+            disabled={isLoading || !isUserInitialized}
           />
-          <Button type="submit" size="icon" disabled={isLoading || !input.trim() || !isInitialized}>
-            {isLoading && messages.length > 0 ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+          <Button type="submit" size="icon" disabled={isLoading || !input.trim() || !isUserInitialized}>
+            {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
             <span className="sr-only">Send</span>
           </Button>
         </form>
